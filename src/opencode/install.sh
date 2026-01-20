@@ -24,4 +24,4 @@ apt-get update
 apt-get install -y curl ca-certificates
 rm -rf /var/lib/apt/lists/*
 
-remote_user_do "curl -fsSL \"$INSTALL_SCRIPT_URL\" | bash -s -- --no-modify-path"
+remote_do "curl -fsSL \"$INSTALL_SCRIPT_URL\" | bash -s -- --no-modify-path"
