@@ -1,0 +1,20 @@
+{
+    "id": "chezmoi",
+    "version": "1.0.0",
+    "name": "chezmoi",
+    "description": "Installs and setup chezmoi.",
+    "documentationURL": "https://github.com/minato-ryan/devcontainer-features/tree/main/src/chezmoi",
+    "options": {
+        "config": {
+            "type": "string",
+            "default": "",
+            "description": "Configuration content to write to ~/.config/chezmoi/chezmoi.toml. File is created so it can be merged with settings defined in dotfiles repository."
+        }
+    },
+    "dependsOn": {
+        "ghcr.io/devcontainers/features/common-utils:2": {}
+    },
+    "installsAfter": [
+        "ghcr.io/devcontainers/features/common-utils"
+    ]
+}

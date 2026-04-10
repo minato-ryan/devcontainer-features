@@ -1,0 +1,10 @@
+{
+    "with_config": {
+        "image": "mcr.microsoft.com/devcontainers/base:debian",
+        "features": {
+            "chezmoi": {
+                "config": "[merge]\nsomething = true\n"
+            }
+        }
+    }
+}
