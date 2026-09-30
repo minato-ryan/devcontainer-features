@@ -4,12 +4,6 @@ set -euo pipefail
 
 INSTALL_SCRIPT_URL="https://opencode.ai/install"
 
-if [ -n "${_REMOTE_USER:-}" ] && [ "${_REMOTE_USER}" != "root" ]; then
-    USER_HOME="/home/${_REMOTE_USER}"
-else
-    USER_HOME="/root"
-fi
-
 remote_do() {
     local cmd=$1
     if [ -n "${_REMOTE_USER:-}" ] && [ "${_REMOTE_USER}" != "root" ]; then
