@@ -1,0 +1,24 @@
+{
+    "with_tools": {
+        "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+        "features": {
+            "uv": {
+                "toolsToInstall": "ruff"
+            }
+        }
+    },
+    "pinned_version": {
+        "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+        "features": {
+            "uv": {
+                "version": "0.5.11"
+            }
+        }
+    },
+    "debian": {
+        "image": "mcr.microsoft.com/devcontainers/base:debian",
+        "features": {
+            "uv": {}
+        }
+    }
+}

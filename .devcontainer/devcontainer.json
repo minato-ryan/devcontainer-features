@@ -18,7 +18,8 @@
         "EditorConfig.EditorConfig",
         "ms-vscode-remote.remote-containers",
         "anthropic.claude-code",
-        "openai.chatgpt"
+        "openai.chatgpt",
+        "google.google-antigravity"
       ]
     }
   },

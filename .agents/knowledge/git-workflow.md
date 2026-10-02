@@ -23,6 +23,20 @@ configured by maintainers.
   The corresponding tag format is `feature_<id>_<semver>`, for example
   `feature_opencode_1.0.0`. A maintainer manually dispatches the release
   workflow from `main`; its publish action creates release tags by default.
+- Guard against secrets and PII leaks: this is a public repository, so pushed
+  commits, issues, or pull requests are immediately public and permanently
+  mirrored or cached across the web. Total deletion after exposure is
+  extraordinarily difficult. Before staging or creating any commit (`git commit`),
+  before pushing any commit (`git push`), and before publishing any Issue or PR
+  title, body, or comment:
+  - Inspect the full diff and text for secrets and credentials (API keys,
+    tokens, private keys, passwords, authentication headers).
+  - Inspect for personal identifiable information (PII) such as personal email
+    addresses, real names, phone numbers, or private internal network hosts.
+- Never bypass Pre-commit hooks under any circumstance (such as passing
+  `--no-verify` or `-n` to `git commit`, or skipping hooks). All hooks,
+  especially secret scanning with `gitleaks`, must execute and pass cleanly.
+  If a hook fails, diagnose and resolve the underlying issue properly.
 
 Agents stop at local changes and validation unless the task explicitly
 delegates a Git or GitHub action. If branch, merge, release, or approval policy
