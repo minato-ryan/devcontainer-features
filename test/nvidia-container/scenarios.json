@@ -1,0 +1,50 @@
+{
+    "docker_in_docker": {
+        "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+        "features": {
+            "ghcr.io/devcontainers/features/docker-in-docker:2": {
+                "moby": false
+            },
+            "nvidia-container": {}
+        }
+    },
+    "without_docker_config": {
+        "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+        "features": {
+            "ghcr.io/devcontainers/features/docker-in-docker:2": {
+                "moby": false
+            },
+            "nvidia-container": {
+                "configureDocker": false
+            }
+        }
+    },
+    "set_as_default": {
+        "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+        "features": {
+            "ghcr.io/devcontainers/features/docker-in-docker:2": {
+                "moby": false
+            },
+            "nvidia-container": {
+                "setAsDefault": true
+            }
+        }
+    },
+    "pinned_version": {
+        "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+        "features": {
+            "nvidia-container": {
+                "version": "1.19.1"
+            }
+        }
+    },
+    "debian": {
+        "image": "mcr.microsoft.com/devcontainers/base:debian",
+        "features": {
+            "ghcr.io/devcontainers/features/docker-in-docker:2": {
+                "moby": false
+            },
+            "nvidia-container": {}
+        }
+    }
+}
