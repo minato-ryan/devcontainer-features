@@ -1,0 +1,32 @@
+{
+    "without_docker_config": {
+        "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+        "features": {
+            "docker-in-docker-nvidia": {
+                "configureDocker": false
+            }
+        }
+    },
+    "set_as_default": {
+        "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+        "features": {
+            "docker-in-docker-nvidia": {
+                "setAsDefault": true
+            }
+        }
+    },
+    "pinned_version": {
+        "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+        "features": {
+            "docker-in-docker-nvidia": {
+                "version": "1.19.1"
+            }
+        }
+    },
+    "debian": {
+        "image": "mcr.microsoft.com/devcontainers/base:debian",
+        "features": {
+            "docker-in-docker-nvidia": {}
+        }
+    }
+}
