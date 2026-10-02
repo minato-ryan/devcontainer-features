@@ -1,0 +1,37 @@
+{
+    "id": "docker-in-docker-nvidia",
+    "version": "1.0.0",
+    "name": "Docker (Docker-in-Docker) with NVIDIA GPU support",
+    "description": "Installs the NVIDIA Container Toolkit and Docker-in-Docker, enabling GPU-accelerated containers inside your development container.",
+    "documentationURL": "https://github.com/minato-ryan/devcontainer-features/tree/main/src/docker-in-docker-nvidia",
+    "options": {
+        "version": {
+            "type": "string",
+            "proposals": [
+                "latest",
+                "1.20.1",
+                "1.19.1"
+            ],
+            "default": "latest",
+            "description": "Select or enter an NVIDIA Container Toolkit version (e.g. 'latest' or '1.20.1')."
+        },
+        "configureDocker": {
+            "type": "boolean",
+            "default": true,
+            "description": "Register the nvidia runtime in /etc/docker/daemon.json."
+        },
+        "setAsDefault": {
+            "type": "boolean",
+            "default": false,
+            "description": "Set nvidia as the default container runtime in Docker daemon."
+        }
+    },
+    "dependsOn": {
+        "ghcr.io/devcontainers/features/docker-in-docker:2": {
+            "moby": false
+        }
+    },
+    "installsAfter": [
+        "ghcr.io/devcontainers/features/docker-in-docker"
+    ]
+}
