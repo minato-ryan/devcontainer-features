@@ -1,6 +1,6 @@
 # Agent guide
 
-This repository publishes Dev Container Features for `chezmoi` and `opencode`.
+This repository publishes Dev Container Features for `chezmoi`, `opencode`, and `uv`.
 Feature metadata and install behavior live in `src/<id>/`; tests live in
 `test/<id>/` and `test/_global/`. Read the manifest, install script, and tests
 for the affected Feature before changing it. The root README still contains
@@ -24,7 +24,7 @@ starter examples and is not the source of truth for current Features.
   Pre-commit and ShellCheck.
 - `just test-feature <id>`: test one Feature's defaults and scenarios.
 - `just test-global`: run global scenarios.
-- `just test`: test both Features and global scenarios.
+- `just test`: test all Features and global scenarios.
 - Feature tests require the Dev Container CLI and a working Docker daemon.
   Metadata validation also runs in the pull-request `validate` workflow.
 

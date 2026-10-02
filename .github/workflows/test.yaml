@@ -14,6 +14,7 @@ jobs:
         features:
           - opencode
           - chezmoi
+          - uv
         baseImage:
           - debian:latest
           - ubuntu:latest
@@ -34,6 +35,7 @@ jobs:
         features:
           - opencode
           - chezmoi
+          - uv
     steps:
       - uses: actions/checkout@v4
 

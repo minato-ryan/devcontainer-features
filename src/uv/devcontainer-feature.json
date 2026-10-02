@@ -1,0 +1,25 @@
+{
+    "id": "uv",
+    "version": "1.0.0",
+    "name": "uv",
+    "description": "Installs Astral's uv and uvx, an extremely fast Python package and project manager.",
+    "documentationURL": "https://github.com/minato-ryan/devcontainer-features/tree/main/src/uv",
+    "options": {
+        "version": {
+            "type": "string",
+            "proposals": [
+                "latest"
+            ],
+            "default": "latest",
+            "description": "Select or enter a uv version (e.g. 'latest' or '0.5.11')."
+        },
+        "toolsToInstall": {
+            "type": "string",
+            "default": "",
+            "description": "Optional comma-separated list of Python CLI tools to install via uv tool (e.g. 'ruff,black')."
+        }
+    },
+    "installsAfter": [
+        "ghcr.io/devcontainers/features/common-utils"
+    ]
+}

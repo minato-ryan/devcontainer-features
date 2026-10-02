@@ -13,4 +13,5 @@ test-global:
 test:
     just test-feature opencode
     just test-feature chezmoi
+    just test-feature uv
     just test-global
