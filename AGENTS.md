@@ -1,6 +1,6 @@
 # Agent guide
 
-This repository publishes Dev Container Features for `chezmoi`, `opencode`, and `uv`.
+This repository publishes Dev Container Features for `chezmoi`, `docker-in-docker-nvidia`, `opencode`, and `uv`.
 Feature metadata and install behavior live in `src/<id>/`; tests live in
 `test/<id>/` and `test/_global/`. Read the manifest, install script, and tests
 for the affected Feature before changing it. The root README still contains
