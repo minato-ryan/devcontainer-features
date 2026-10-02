@@ -24,12 +24,12 @@ readonly PACKAGES=(
 export DEBIAN_FRONTEND=noninteractive
 
 fail() {
-  echo "(!) docker-in-docker-nvidia: $*" >&2
+  echo "(!) nvidia-container: $*" >&2
   exit 1
 }
 
 log() {
-  echo "docker-in-docker-nvidia: $*"
+  echo "nvidia-container: $*"
 }
 
 # --- Validation. Nothing changes the image until the version, distribution, and architecture pass.
