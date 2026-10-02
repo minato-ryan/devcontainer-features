@@ -30,8 +30,14 @@ starter examples and is not the source of truth for current Features.
 
 Agents may inspect, edit, and validate locally. A maintainer decides when to
 commit, push, open or merge a PR, and trigger the manual release workflow,
-unless a later task explicitly delegates one of those actions. Keep credentials
-out of repository files and command output.
+unless a later task explicitly delegates one of those actions. Because this is
+a public repository, scrubbing sensitive data after publication is rarely
+complete. Before committing, pushing, or publishing any Issue or PR, agents
+must explicitly inspect all diffs, messages, titles, bodies, and command output
+for secrets (API keys, tokens, credentials, private keys) and personal
+identifiable information (PII such as personal emails, real names, or private
+hostnames). Pre-commit hooks—including Gitleaks secret scanning—must never be
+bypassed under any circumstance (e.g. no `--no-verify`).
 
 Keep guidance current in the same change:
 
