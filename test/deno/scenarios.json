@@ -1,0 +1,16 @@
+{
+    "pinned_version": {
+        "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+        "features": {
+            "deno": {
+                "version": "2.8.0"
+            }
+        }
+    },
+    "debian": {
+        "image": "mcr.microsoft.com/devcontainers/base:debian",
+        "features": {
+            "deno": {}
+        }
+    }
+}
