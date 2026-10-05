@@ -1,0 +1,16 @@
+{
+    "pinned_version": {
+        "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+        "features": {
+            "hf-cli": {
+                "version": "2.1.1"
+            }
+        }
+    },
+    "debian": {
+        "image": "mcr.microsoft.com/devcontainers/base:debian",
+        "features": {
+            "hf-cli": {}
+        }
+    }
+}
