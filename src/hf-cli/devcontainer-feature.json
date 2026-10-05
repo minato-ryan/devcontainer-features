@@ -1,0 +1,22 @@
+{
+    "id": "hf-cli",
+    "version": "1.0.0",
+    "name": "Hugging Face CLI (hf)",
+    "description": "Installs the Hugging Face CLI (hf), bringing the Hugging Face Hub to your terminal.",
+    "documentationURL": "https://github.com/minato-ryan/devcontainer-features/tree/main/src/hf-cli",
+    "options": {
+        "version": {
+            "type": "string",
+            "proposals": [
+                "latest",
+                "2.1.1"
+            ],
+            "default": "latest",
+            "description": "Select or enter a huggingface_hub version (e.g. 'latest' or '2.1.1')."
+        }
+    },
+    "installsAfter": [
+        "ghcr.io/devcontainers/features/common-utils",
+        "ghcr.io/devcontainers/features/python"
+    ]
+}
