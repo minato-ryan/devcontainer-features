@@ -1,10 +1,11 @@
 # Agent guide
 
-This repository publishes Dev Container Features for `chezmoi`, `glab`, `nvidia-container`, `opencode`, and `uv`.
-Feature metadata and install behavior live in `src/<id>/`; tests live in
-`test/<id>/` and `test/_global/`. Read the manifest, install script, and tests
-for the affected Feature before changing it. The root README still contains
-starter examples and is not the source of truth for current Features.
+This repository publishes Dev Container Features located in `src/`. Inspect
+`src/<id>/` to discover available Features. Feature metadata and install
+behavior live in `src/<id>/`; tests live in `test/<id>/` and `test/_global/`.
+Read the manifest, install script, and tests for the affected Feature before
+changing it. The root README still contains starter examples and is not the
+source of truth for current Features.
 
 ## Read when needed
 
@@ -41,8 +42,8 @@ bypassed under any circumstance (e.g. no `--no-verify`).
 
 Keep guidance current in the same change:
 
-- A new or removed Feature or a changed test layout updates this map and the
-  Feature workflow.
+- A changed Feature or test layout updates this guide and the Feature
+  workflow.
 - A changed `justfile`, Pre-commit config, devcontainer setup, or test CI job
   updates the validation commands here and any affected Feature workflow step.
 - A changed release workflow or integration policy updates the Git workflow,
