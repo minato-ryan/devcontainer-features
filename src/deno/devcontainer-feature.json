@@ -1,0 +1,27 @@
+{
+    "id": "deno",
+    "version": "1.0.0",
+    "name": "Deno",
+    "description": "Installs the Deno runtime, JavaScript/TypeScript engine, and package manager.",
+    "documentationURL": "https://github.com/minato-ryan/devcontainer-features/tree/main/src/deno",
+    "options": {
+        "version": {
+            "type": "string",
+            "proposals": [
+                "latest",
+                "2.9.7",
+                "2.8.0"
+            ],
+            "default": "latest",
+            "description": "Select or enter a Deno version (e.g. 'latest' or '2.9.7')."
+        }
+    },
+    "containerEnv": {
+        "NO_UPDATE_CHECK": "1",
+        "PATH": "/usr/local/share/deno/bin:${PATH}"
+    },
+    "installsAfter": [
+        "ghcr.io/devcontainers/features/common-utils",
+        "ghcr.io/devcontainers/features/node"
+    ]
+}
