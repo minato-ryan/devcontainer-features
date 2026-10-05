@@ -17,6 +17,7 @@ jobs:
           - uv
           - nvidia-container
           - glab
+          - hf-cli
         baseImage:
           - debian:latest
           - ubuntu:latest
@@ -40,6 +41,7 @@ jobs:
           - uv
           - nvidia-container
           - glab
+          - hf-cli
     steps:
       - uses: actions/checkout@v4
 
