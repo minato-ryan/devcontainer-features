@@ -1,0 +1,16 @@
+{
+    "pinned_version": {
+        "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+        "features": {
+            "openspec": {
+                "version": "1.14.0"
+            }
+        }
+    },
+    "debian": {
+        "image": "mcr.microsoft.com/devcontainers/base:debian",
+        "features": {
+            "openspec": {}
+        }
+    }
+}

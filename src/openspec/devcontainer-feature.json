@@ -1,0 +1,29 @@
+{
+    "id": "openspec",
+    "version": "1.0.0",
+    "name": "OpenSpec CLI (openspec)",
+    "description": "Installs the OpenSpec CLI (openspec), published on npm as @fission-ai/openspec, an AI-native system for spec-driven development.",
+    "documentationURL": "https://github.com/minato-ryan/devcontainer-features/tree/main/src/openspec",
+    "options": {
+        "version": {
+            "type": "string",
+            "proposals": [
+                "latest",
+                "1.14.1",
+                "1.14.0"
+            ],
+            "default": "latest",
+            "description": "Select or enter an OpenSpec version (e.g. 'latest' or '1.14.1')."
+        }
+    },
+    "dependsOn": {
+        "ghcr.io/devcontainers/features/node:1": {}
+    },
+    "installsAfter": [
+        "ghcr.io/devcontainers/features/common-utils",
+        "ghcr.io/devcontainers/features/node"
+    ],
+    "containerEnv": {
+        "PATH": "/usr/local/bin:${PATH}"
+    }
+}
