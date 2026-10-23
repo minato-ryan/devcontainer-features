@@ -19,6 +19,7 @@ jobs:
           - glab
           - hf-cli
           - deno
+          - openspec
         baseImage:
           - debian:latest
           - ubuntu:latest
@@ -44,6 +45,7 @@ jobs:
           - glab
           - hf-cli
           - deno
+          - openspec
     steps:
       - uses: actions/checkout@v4
 
