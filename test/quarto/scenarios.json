@@ -1,0 +1,24 @@
+{
+    "pinned_version": {
+        "image": "debian:latest",
+        "features": {
+            "quarto": {
+                "version": "1.9.38",
+                "checksumsSha256": "a936197982c2e5df434d9a10117df232650c48bdcd82320e61d085c36c60c2b7"
+            }
+        }
+    },
+    "fedora": {
+        "image": "fedora:latest",
+        "features": {
+            "quarto": {}
+        }
+    },
+    "remote_user": {
+        "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+        "remoteUser": "vscode",
+        "features": {
+            "quarto": {}
+        }
+    }
+}
