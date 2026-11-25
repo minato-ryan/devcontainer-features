@@ -21,7 +21,7 @@ configured by maintainers.
   a PR, then let a maintainer publish the affected Feature.
 - Version each Feature independently in its `devcontainer-feature.json`.
   The corresponding tag format is `feature_<id>_<semver>`, for example
-  `feature_opencode_1.0.0`. A maintainer manually dispatches the release
+  `feature_uv_1.0.0`. A maintainer manually dispatches the release
   workflow from `main`; its publish action creates release tags by default.
 - Guard against secrets and PII leaks: this is a public repository, so pushed
   commits, issues, or pull requests are immediately public and permanently

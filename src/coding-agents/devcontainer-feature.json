@@ -1,0 +1,84 @@
+{
+    "id": "coding-agents",
+    "version": "1.0.0",
+    "name": "Coding Agents",
+    "description": "Installs popular CLI coding agents (Claude Code, Codex, OpenCode, Pi, and Antigravity) and persists their credentials, configuration, and sessions in a private project-scoped volume.",
+    "documentationURL": "https://github.com/minato-ryan/devcontainer-features/tree/main/src/coding-agents",
+    "options": {
+        "installClaudeCode": {
+            "type": "boolean",
+            "default": true,
+            "description": "Install Claude Code CLI (claude)."
+        },
+        "claudeCodeVersion": {
+            "type": "string",
+            "proposals": [
+                "latest",
+                "2.1.332"
+            ],
+            "default": "latest",
+            "description": "Claude Code version to install ('latest' or exact MAJOR.MINOR.PATCH >= 2.1.89)."
+        },
+        "installCodex": {
+            "type": "boolean",
+            "default": true,
+            "description": "Install OpenAI Codex CLI (codex)."
+        },
+        "codexVersion": {
+            "type": "string",
+            "proposals": [
+                "latest",
+                "0.172.0"
+            ],
+            "default": "latest",
+            "description": "OpenAI Codex version to install ('latest' or exact MAJOR.MINOR.PATCH)."
+        },
+        "installOpenCode": {
+            "type": "boolean",
+            "default": true,
+            "description": "Install OpenCode CLI (opencode)."
+        },
+        "openCodeVersion": {
+            "type": "string",
+            "proposals": [
+                "latest",
+                "2.4.1"
+            ],
+            "default": "latest",
+            "description": "OpenCode 2.x version to install ('latest' or exact MAJOR.MINOR.PATCH)."
+        },
+        "installPi": {
+            "type": "boolean",
+            "default": true,
+            "description": "Install Pi coding agent CLI (pi)."
+        },
+        "piVersion": {
+            "type": "string",
+            "proposals": [
+                "latest",
+                "1.6.0"
+            ],
+            "default": "latest",
+            "description": "Pi version to install ('latest' or exact MAJOR.MINOR.PATCH >= 1.3.0)."
+        },
+        "installAntigravity": {
+            "type": "boolean",
+            "default": true,
+            "description": "Install Google Antigravity CLI (agy)."
+        }
+    },
+    "containerEnv": {
+        "AGY_CLI_DISABLE_AUTO_UPDATE": "true"
+    },
+    "installsAfter": [
+        "ghcr.io/devcontainers/features/common-utils"
+    ],
+    "mounts": [
+        {
+            "source": "coding-agents-${devcontainerId}",
+            "target": "/var/lib/coding-agents",
+            "type": "volume"
+        }
+    ],
+    "onCreateCommand": "/usr/local/share/coding-agents-feature/initialize"
+}

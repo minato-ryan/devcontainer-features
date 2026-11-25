@@ -18,7 +18,7 @@
 <p>
   <a href="https://github.com/minato-ryan/devcontainer-features/actions/workflows/test.yaml"><img src="https://github.com/minato-ryan/devcontainer-features/actions/workflows/test.yaml/badge.svg" alt="Test Features" /></a>
   <a href="https://github.com/minato-ryan/devcontainer-features/actions/workflows/validate.yml"><img src="https://github.com/minato-ryan/devcontainer-features/actions/workflows/validate.yml/badge.svg" alt="Validate Metadata" /></a>
-  <img src="https://img.shields.io/badge/Features-10-0EA5E9?style=flat-square" alt="Features: 10" />
+  <img src="https://img.shields.io/badge/Features-11-0EA5E9?style=flat-square" alt="Features: 11" />
   <img src="https://img.shields.io/badge/Registry-GHCR-6366F1?style=flat-square&amp;logo=github" alt="Registry: GHCR" />
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-10B981?style=flat-square" alt="License: MIT" /></a>
 </p>
@@ -61,6 +61,11 @@
       <td><code>ghcr.io/minato-ryan/devcontainer-features/chezmoi:1</code></td>
     </tr>
     <tr>
+      <td><a href="src/coding-agents/README.md"><strong>coding-agents</strong></a><br /><sub>AI / Coding</sub></td>
+      <td>Claude Code・Codex・OpenCode・Pi・Antigravity CLI のインストールとプロジェクト単位の認証情報・設定永続化<br /><sub>オプション: <code>install*</code>, <code>*Version</code> ・ ボリューム永続化: <code>/var/lib/coding-agents</code></sub></td>
+      <td><code>ghcr.io/minato-ryan/devcontainer-features/coding-agents:1</code></td>
+    </tr>
+    <tr>
       <td><a href="src/colab/README.md"><strong>colab</strong></a><br /><sub>AI / Cloud</sub></td>
       <td>Google Colab CLI（<code>colab</code>）・<code>rclone</code> の導入、<code>colab-adc</code> コマンドおよびプロジェクト単位の ADC 認証情報永続化<br /><sub>オプション: <code>version</code>, <code>defaultAuth</code>, <code>installRclone</code>, <code>rcloneVersion</code>, <code>installRcloneMountDependencies</code> ・ 依存: <code>uv</code> ・ ボリューム: <code>/var/lib/colab</code></sub></td>
       <td><code>ghcr.io/minato-ryan/devcontainer-features/colab:1</code></td>
@@ -84,11 +89,6 @@
       <td><a href="src/nvidia-container/README.md"><strong>nvidia-container</strong></a><br /><sub>GPU / Docker</sub></td>
       <td>NVIDIA Container Toolkit の導入および Docker ランタイム設定<br /><sub>オプション: <code>version</code>, <code>configureDocker</code>, <code>setAsDefault</code></sub></td>
       <td><code>ghcr.io/minato-ryan/devcontainer-features/nvidia-container:1</code></td>
-    </tr>
-    <tr>
-      <td><a href="src/opencode/README.md"><strong>opencode</strong></a><br /><sub>AI / Coding</sub></td>
-      <td>OpenCode CLI のインストール<br /><sub>オプションなし（<code>common-utils</code> の後に実行）</sub></td>
-      <td><code>ghcr.io/minato-ryan/devcontainer-features/opencode:1</code></td>
     </tr>
     <tr>
       <td><a href="src/openspec/README.md"><strong>openspec</strong></a><br /><sub>AI / Spec</sub></td>
