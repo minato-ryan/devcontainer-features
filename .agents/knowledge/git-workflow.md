@@ -14,9 +14,9 @@ configured by maintainers.
   most 50 characters without a final period; keep body lines at most 72
   characters. Do not attribute commits to AI tools.
 - Integrate through a PR after the relevant CI checks pass and a maintainer
-  approves it. Use a merge commit, then delete the short-lived branch.
-  `main` protection and required checks are maintainer-managed GitHub
-  settings; this file does not assert that they are currently enforced.
+  approves it. Use a squash merge; GitHub automatically deletes the
+  short-lived branch after merge. `main` protection and required checks are
+  maintainer-managed GitHub settings.
 - Treat urgent fixes the same way: branch from `main`, validate, merge through
   a PR, then let a maintainer publish the affected Feature.
 - Version each Feature independently in its `devcontainer-feature.json`.
