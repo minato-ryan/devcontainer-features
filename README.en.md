@@ -11,11 +11,6 @@
 <h1>Dev Container Features</h1>
 
 <p>
-  Custom <a href="https://containers.dev/implementors/features/">Dev Container Features</a> collection<br />
-  published to GitHub Container Registry (<code>ghcr.io/minato-ryan/devcontainer-features</code>)
-</p>
-
-<p>
   <a href="https://github.com/minato-ryan/devcontainer-features/actions/workflows/test.yaml"><img src="https://github.com/minato-ryan/devcontainer-features/actions/workflows/test.yaml/badge.svg" alt="Test Features" /></a>
   <a href="https://github.com/minato-ryan/devcontainer-features/actions/workflows/validate.yml"><img src="https://github.com/minato-ryan/devcontainer-features/actions/workflows/validate.yml/badge.svg" alt="Validate Metadata" /></a>
   <img src="https://img.shields.io/badge/Features-11-0EA5E9?style=flat-square" alt="Features: 11" />
