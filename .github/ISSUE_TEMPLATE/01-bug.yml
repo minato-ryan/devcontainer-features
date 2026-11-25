@@ -1,0 +1,46 @@
+name: Bug report
+description: A published Feature or repository tooling behaves differently from its documentation.
+body:
+  - type: input
+    id: feature
+    attributes:
+      label: Feature
+      description: Feature id and version/tag you used (e.g., `uv:1.0.0`), or the tooling area (`ci`, `agents`, `devcontainer`, `docs`).
+    validations:
+      required: true
+  - type: input
+    id: image
+    attributes:
+      label: Base image
+      description: For a Feature, the base image (and architecture, if not amd64) the dev container was built from.
+    validations:
+      required: false
+  - type: textarea
+    id: actual
+    attributes:
+      label: What happens
+      description: The observed behavior verbatim. Paste build, install, or CI output rather than paraphrasing it. Remove tokens and private hostnames first.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What should happen
+      description: The intended behavior. Together with the field above, this is the acceptance criterion for the fix.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: How to reproduce
+      description: Minimal `devcontainer.json` (with Feature options) and steps that show the problem; for tooling, the commands or workflow run.
+      render: jsonc
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Context and references
+      description: Tool versions, related issues or pull requests, suspected upstream changes.
+    validations:
+      required: false
