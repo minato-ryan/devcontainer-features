@@ -19,4 +19,3 @@ check "state volume and links ready on debian" bash -lc '
 '
 
 reportResults
-

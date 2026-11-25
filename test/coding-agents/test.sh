@@ -6,12 +6,18 @@ set -e
 source dev-container-features-test-lib
 
 check "claude version" claude --version
+check "nested claude with managed CLAUDE_CONFIG_DIR" bash -lc 'CLAUDE_CONFIG_DIR=/var/lib/coding-agents/claude-code claude --version'
 check "codex version" codex --version
 check "opencode version" opencode --version
 check "pi version" pi --version
 check "agy version" agy --version
 # shellcheck disable=SC2016
 check "AGY_CLI_DISABLE_AUTO_UPDATE is true" bash -lc '[ "${AGY_CLI_DISABLE_AUTO_UPDATE:-}" = "true" ]'
+
+# shellcheck disable=SC2016
+check "home has no spurious nested user directories" bash -lc '
+    [ ! -e "$HOME/home" ] && [ ! -e "/root/root" ]
+'
 
 # shellcheck disable=SC2016
 check "state volume mounted with private mode" bash -lc '
@@ -40,7 +46,15 @@ check "writes through home links land on state volume" bash -lc '
     rm -f "$HOME/.codex/test-state.json"
 '
 
+# shellcheck disable=SC2016
+check "initialize tightens loose credential permissions without sudo" bash -lc '
+    : > /var/lib/coding-agents/opencode/data/opencode.db &&
+    chmod 0644 /var/lib/coding-agents/opencode/data/opencode.db &&
+    /usr/local/share/coding-agents-feature/initialize &&
+    [ "$(stat -c "%a" /var/lib/coding-agents/opencode/data/opencode.db)" = "600" ] &&
+    rm -f /var/lib/coding-agents/opencode/data/opencode.db
+'
+
 check "initialize script is idempotent" /usr/local/share/coding-agents-feature/initialize
 
 reportResults
-

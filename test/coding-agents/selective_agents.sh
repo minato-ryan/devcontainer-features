@@ -18,11 +18,14 @@ check "disabled agents are absent" bash -lc '
 # shellcheck disable=SC2016
 check "only enabled agent links exist" bash -lc '
     [ "$(readlink -f "$HOME/.codex")" = "/var/lib/coding-agents/codex" ] &&
+    [ "$(readlink -f "$HOME/.local/share/opencode")" = "/var/lib/coding-agents/opencode/data" ] &&
     [ "$(readlink -f "$HOME/.config/opencode")" = "/var/lib/coding-agents/opencode/config" ] &&
-    [ ! -e "$HOME/.claude" ] &&
-    [ ! -e "$HOME/.pi" ] &&
-    [ ! -e "$HOME/.gemini" ]
+    [ "$(readlink -f "$HOME/.local/state/opencode")" = "/var/lib/coding-agents/opencode/state" ] &&
+    [ "$(readlink -f "$HOME/.cache/opencode")" = "/var/lib/coding-agents/opencode/cache" ] &&
+    [ ! -e "$HOME/.claude" ] && [ ! -L "$HOME/.claude" ] &&
+    [ ! -e "$HOME/.pi" ] && [ ! -L "$HOME/.pi" ] &&
+    [ ! -e "$HOME/.gemini" ] && [ ! -L "$HOME/.gemini" ] &&
+    [ ! -e "$HOME/.config/antigravity" ] && [ ! -L "$HOME/.config/antigravity" ]
 '
 
 reportResults
-

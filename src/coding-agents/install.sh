@@ -2,6 +2,7 @@
 # Installs selected CLI coding agents (Claude Code, Codex, OpenCode, Pi, Antigravity) from verified
 # official releases and prepares project-scoped state persistence under /var/lib/coding-agents.
 set -euo pipefail
+umask 022
 
 readonly APP_ROOT="/usr/local/share/coding-agents"
 readonly HELPER_DIR="/usr/local/share/coding-agents-feature"
@@ -62,7 +63,7 @@ fetch() {
 }
 
 fetch_redirect_url() {
-    curl --proto '=https' --proto-redir '=https' -fsS -I -o /dev/null -w '%{redirect_url}' "$1"
+    curl --proto '=https' --proto-redir '=https' -fsS --retry 3 -I -o /dev/null -w '%{redirect_url}' "$1"
 }
 
 version_at_least() {
@@ -162,7 +163,9 @@ detect_platform() {
     fi
 
     if [[ -r /etc/os-release ]]; then
+        # shellcheck source=/dev/null
         os_id="$(. /etc/os-release && printf '%s' "${ID:-unknown}")"
+        # shellcheck source=/dev/null
         os_version="$(. /etc/os-release && printf '%s' "${VERSION_ID:-unknown}")"
         case "${os_id}:${os_version}" in
             debian:12 | debian:13 | ubuntu:24.04 | ubuntu:22.04) ;;
@@ -177,8 +180,16 @@ detect_platform() {
     REMOTE_USER="${_REMOTE_USER:-root}"
     id "${REMOTE_USER}" >/dev/null 2>&1 || fail "remote user '${REMOTE_USER}' does not exist."
     REMOTE_GROUP="$(id -g "${REMOTE_USER}")"
-    REMOTE_HOME="${_REMOTE_USER_HOME:-$(getent passwd "${REMOTE_USER}" | cut -d: -f6 || true)}"
-    [[ "${REMOTE_HOME}" == /* && -d "${REMOTE_HOME}" ]] || fail "remote-user home directory is unavailable for '${REMOTE_USER}'."
+    if [[ -n "${_REMOTE_USER_HOME:-}" ]]; then
+        REMOTE_HOME="${_REMOTE_USER_HOME}"
+    elif command -v getent >/dev/null 2>&1; then
+        REMOTE_HOME="$(getent passwd "${REMOTE_USER}" | cut -d: -f6 || true)"
+    else
+        REMOTE_HOME="$(awk -F: -v u="${REMOTE_USER}" '$1 == u { print $6; exit }' /etc/passwd || true)"
+    fi
+    REMOTE_HOME="${REMOTE_HOME%/}"
+    [[ "${REMOTE_HOME}" == /* && "${REMOTE_HOME}" != "/" && -d "${REMOTE_HOME}" ]] \
+        || fail "remote-user home directory is unavailable for '${REMOTE_USER}'."
 }
 
 check_link_target() {
@@ -197,7 +208,8 @@ check_state_conflicts() {
     [[ ! -e "${STATE_DIR}" || -d "${STATE_DIR}" ]] || fail "${STATE_DIR} is not a directory."
 
     if [[ "${INSTALLCLAUDECODE}" == "true" ]]; then
-        [[ -z "${CLAUDE_CONFIG_DIR+x}" ]] || fail "CLAUDE_CONFIG_DIR is set; unset it before installing Claude Code."
+        [[ -z "${CLAUDE_CONFIG_DIR+x}" || "${CLAUDE_CONFIG_DIR}" == "${STATE_DIR}/claude-code" ]] \
+            || fail "CLAUDE_CONFIG_DIR is set; unset it before installing Claude Code."
         [[ ! -e "${REMOTE_HOME}/.claude.json" && ! -L "${REMOTE_HOME}/.claude.json" ]] \
             || fail "existing '${REMOTE_HOME}/.claude.json' conflicts; back it up and migrate it explicitly."
         check_link_target "${REMOTE_HOME}/.claude" "${STATE_DIR}/claude-code"
@@ -214,7 +226,7 @@ check_state_conflicts() {
             kind="${entry%%:*}"
             rel_root="${entry#*:}"
             full_root="${REMOTE_HOME}/${rel_root}"
-            if [[ -e "${full_root}" && ! -d "${full_root}" ]]; then
+            if [[ ( -e "${full_root}" || -L "${full_root}" ) && ! -d "${full_root}" ]]; then
                 fail "'${full_root}' is not a directory."
             fi
             check_link_target "${full_root}/opencode" "${STATE_DIR}/opencode/${kind}"
@@ -243,7 +255,7 @@ check_state_conflicts() {
             subdir="${entry#*:}"
             full_path="${REMOTE_HOME}/${rel_path}"
             parent="$(dirname "${full_path}")"
-            if [[ -e "${parent}" && ! -d "${parent}" ]]; then
+            if [[ ( -e "${parent}" || -L "${parent}" ) && ! -d "${parent}" ]]; then
                 fail "'${parent}' is not a directory."
             fi
             check_link_target "${full_path}" "${STATE_DIR}/antigravity/${subdir}"
@@ -268,7 +280,13 @@ install_prerequisites() {
             break
         fi
     done
-    if [[ ! -e /etc/ssl/certs/ca-certificates.crt ]]; then
+    if [[ ! -e /etc/ssl/certs/ca-certificates.crt && ! -e /etc/pki/tls/certs/ca-bundle.crt ]]; then
+        missing=true
+    fi
+    if ! tar --version 2>/dev/null | grep -q "GNU"; then
+        missing=true
+    fi
+    if ! readlink -m / >/dev/null 2>&1; then
         missing=true
     fi
 
@@ -293,7 +311,10 @@ install_prerequisites() {
         fi
         apk add --no-cache "${apk_pkgs[@]}"
     elif command -v dnf >/dev/null 2>&1; then
-        local -a dnf_pkgs=(ca-certificates curl jq tar gzip coreutils findutils util-linux)
+        local -a dnf_pkgs=(ca-certificates jq tar gzip coreutils findutils util-linux)
+        if ! command -v curl >/dev/null 2>&1; then
+            dnf_pkgs+=(curl)
+        fi
         if [[ "${INSTALLCLAUDECODE}" == "true" ]]; then
             dnf_pkgs+=(gnupg2)
         fi
@@ -305,10 +326,18 @@ install_prerequisites() {
 }
 
 make_user_dir() {
-    local target_dir="$1"
+    local target_dir="${1%/}"
     local mode="${2:-0755}"
-    local relative="${target_dir#"${REMOTE_HOME}"/}"
-    local dir="${REMOTE_HOME}"
+    local home_base="${REMOTE_HOME%/}"
+
+    if [[ "${target_dir}" == "${home_base}" ]]; then
+        return 0
+    fi
+    [[ "${target_dir}" == "${home_base}/"* ]] \
+        || fail "internal error: '${target_dir}' is outside '${home_base}'."
+
+    local relative="${target_dir#"${home_base}"/}"
+    local dir="${home_base}"
     local part
     local -a parts
     IFS='/' read -r -a parts <<< "${relative}"
@@ -359,18 +388,31 @@ install_claude_code() {
         fetch -o "${stage}/key.asc" "${CLAUDE_SIGNING_KEY_URL}" \
             || fail "failed to download Claude Code signing key."
 
-        local pub_count
-        pub_count="$(gpg --batch --homedir "${stage}/gnupg" --with-colons --show-keys "${stage}/key.asc" \
-            | awk -F: '$1 == "pub" {n++} END {print n+0}')"
+        local key_info pub_count
+        key_info="$(gpg --batch --homedir "${stage}/gnupg" --with-colons --show-keys "${stage}/key.asc")" \
+            || fail "failed to inspect Claude Code signing key."
+        if awk -F: '$1 == "sec" || $1 == "ssb" { found=1 } END { exit !found }' <<< "${key_info}"; then
+            fail "Claude Code signing key bundle contains unexpected secret key records."
+        fi
+        pub_count="$(awk -F: '$1 == "pub" { n++ } END { print n+0 }' <<< "${key_info}")"
         [[ "${pub_count}" == "1" ]] || fail "Claude Code signing key bundle must contain exactly 1 public key."
-        fingerprint="$(gpg --batch --homedir "${stage}/gnupg" --with-colons --show-keys "${stage}/key.asc" \
-            | awk -F: '$1 == "fpr" {print $10; exit}')"
+        fingerprint="$(awk -F: '$1 == "fpr" { print $10; exit }' <<< "${key_info}")"
         [[ "${fingerprint}" == "${CLAUDE_SIGNING_FINGERPRINT}" ]] \
             || fail "Claude Code signing key fingerprint mismatch (got '${fingerprint}')."
 
         gpg --batch --homedir "${stage}/gnupg" --import "${stage}/key.asc" >/dev/null 2>&1
-        gpg --batch --homedir "${stage}/gnupg" --verify "${stage}/manifest.sig" "${stage}/manifest.json" 2>/dev/null \
+        local gpg_status
+        gpg_status="$(gpg --batch --homedir "${stage}/gnupg" --status-fd 1 \
+            --verify "${stage}/manifest.sig" "${stage}/manifest.json" 2>/dev/null)" \
             || fail "Claude Code manifest signature verification failed."
+        if grep -qE '^\[GNUPG:\] (PLAINTEXT|UNEXPECTED|NODATA|BADSIG|ERRSIG|EXPSIG|EXPKEYSIG|REVKEYSIG)([[:space:]]|$)' <<< "${gpg_status}"; then
+            fail "Claude Code manifest signature status indicates an invalid, expired, or non-detached signature."
+        fi
+        grep -q '^\[GNUPG:\] GOODSIG ' <<< "${gpg_status}" \
+            || fail "Claude Code manifest signature missing GOODSIG status."
+        awk -v fpr="${CLAUDE_SIGNING_FINGERPRINT}" \
+            '$1 == "[GNUPG:]" && $2 == "VALIDSIG" && $12 == fpr { found=1 } END { exit !found }' <<< "${gpg_status}" \
+            || fail "Claude Code manifest signature did not validate against pinned key ${CLAUDE_SIGNING_FINGERPRINT}."
 
         expected="$(jq -er --arg version "${resolved}" --arg target "${target}" \
             'select(.version == $version) | .platforms[$target] | select(.binary == "claude") | .checksum' \
@@ -390,15 +432,15 @@ install_claude_code() {
             || fail "Claude Code self-test returned '${verified_ver}', expected '${resolved} (Claude Code)'."
 
         install -d -m 0755 "${app_dir}"
+        chown root:root "${stage}/claude"
         mv -f "${stage}/claude" "${app_dir}/claude"
     else
         log "Claude Code ${resolved} is already installed."
     fi
 
-    cat > /usr/local/bin/claude <<'EOF'
+    cat > "${stage}/claude-wrapper" <<'EOF'
 #!/usr/bin/env bash
-umask 077
-if [[ -n "${CLAUDE_CONFIG_DIR+x}" ]]; then
+if [[ -n "${CLAUDE_CONFIG_DIR+x}" && "${CLAUDE_CONFIG_DIR}" != "/var/lib/coding-agents/claude-code" ]]; then
     printf 'coding-agents feature: error: unset CLAUDE_CONFIG_DIR when using the managed Claude Code wrapper.\n' >&2
     exit 1
 fi
@@ -406,8 +448,9 @@ export CLAUDE_CONFIG_DIR="/var/lib/coding-agents/claude-code"
 export DISABLE_AUTOUPDATER=1
 exec /usr/local/share/coding-agents/claude-code/claude "$@"
 EOF
-    chmod 0755 /usr/local/bin/claude
-    chown root:root /usr/local/bin/claude
+    chmod 0755 "${stage}/claude-wrapper"
+    chown root:root "${stage}/claude-wrapper"
+    mv -f "${stage}/claude-wrapper" /usr/local/bin/claude
 }
 
 install_codex() {
@@ -458,17 +501,25 @@ install_codex() {
         printf '%s  %s\n' "${expected}" "${stage}/${asset}" | sha256sum -c --quiet \
             || fail "Codex archive SHA-256 checksum verification failed."
 
-        tar -xzf "${stage}/${asset}" --no-same-owner -C "${stage}/application"
-        [[ -x "${stage}/application/bin/codex" \
-            && -x "${stage}/application/bin/codex-code-mode-host" \
-            && -x "${stage}/application/codex-path/rg" ]] \
-            || fail "Codex package is incomplete."
+        tar -xzf "${stage}/${asset}" --no-same-owner --no-same-permissions -C "${stage}/application"
+        local bin_rel
+        for bin_rel in "bin/codex" "bin/codex-code-mode-host" "codex-path/rg"; do
+            [[ -f "${stage}/application/${bin_rel}" && ! -L "${stage}/application/${bin_rel}" ]] \
+                || fail "Codex package is missing regular file '${bin_rel}'."
+        done
+        if [[ -e "${stage}/application/codex-resources/bwrap" || -L "${stage}/application/codex-resources/bwrap" ]]; then
+            [[ -f "${stage}/application/codex-resources/bwrap" && ! -L "${stage}/application/codex-resources/bwrap" ]] \
+                || fail "Codex package contains invalid codex-resources/bwrap entry."
+        fi
+
+        chmod -R a-s,u=rwX,go=rX "${stage}/application"
         chmod 0755 "${stage}/application/bin/codex" \
             "${stage}/application/bin/codex-code-mode-host" \
             "${stage}/application/codex-path/rg"
         if [[ -f "${stage}/application/codex-resources/bwrap" ]]; then
             chmod 0755 "${stage}/application/codex-resources/bwrap"
         fi
+        chown -R root:root "${stage}/application"
 
         local verified_ver
         verified_ver="$(env -u CODEX_HOME HOME="${stage}/home" "${stage}/application/bin/codex" --version)" \
@@ -476,21 +527,26 @@ install_codex() {
         [[ "${verified_ver}" == "codex-cli ${resolved}" ]] \
             || fail "Codex self-test returned '${verified_ver}', expected 'codex-cli ${resolved}'."
 
-        install -d -m 0755 "${APP_ROOT}"
-        rm -rf "${app_dir}"
-        mv "${stage}/application" "${app_dir}"
-        chmod 0755 "${app_dir}"
+        if [[ -e "${app_dir}" || -L "${app_dir}" ]]; then
+            mv "${app_dir}" "${stage}/previous"
+        fi
+        if ! mv "${stage}/application" "${app_dir}"; then
+            if [[ -e "${stage}/previous" || -L "${stage}/previous" ]]; then
+                mv "${stage}/previous" "${app_dir}" || true
+            fi
+            fail "failed to install Codex into ${app_dir}."
+        fi
     else
         log "Codex ${resolved} is already installed."
     fi
 
-    cat > /usr/local/bin/codex <<'EOF'
+    cat > "${stage}/codex-wrapper" <<'EOF'
 #!/usr/bin/env bash
-umask 077
 exec /usr/local/share/coding-agents/codex/bin/codex "$@"
 EOF
-    chmod 0755 /usr/local/bin/codex
-    chown root:root /usr/local/bin/codex
+    chmod 0755 "${stage}/codex-wrapper"
+    chown root:root "${stage}/codex-wrapper"
+    mv -f "${stage}/codex-wrapper" /usr/local/bin/codex
 }
 
 run_opencode_isolated() {
@@ -550,13 +606,15 @@ install_opencode() {
     [[ "${integrity}" =~ ^sha512-[A-Za-z0-9+/]{86}==$ ]] \
         || fail "OpenCode package metadata lacks valid SHA-512 integrity."
 
-    expected="$(base64 -d <<< "${integrity#sha512-}" | od -An -tx1 -v | tr -d ' \n')"
+    expected="$(base64 -d <<< "${integrity#sha512-}" | od -An -tx1 -v | tr -d '[:space:]')"
     fetch -o "${stage}/package.tgz" "${tarball}" || fail "failed to download ${tarball}."
     actual="$(sha512sum "${stage}/package.tgz" | cut -d' ' -f1)"
     [[ "${actual}" == "${expected}" ]] || fail "OpenCode tarball SHA-512 verification failed."
 
-    tar -xzf "${stage}/package.tgz" --no-same-owner -C "${stage}" package/bin/opencode \
+    tar -xzf "${stage}/package.tgz" --no-same-owner --no-same-permissions -C "${stage}" package/bin/opencode \
         || fail "OpenCode archive does not contain package/bin/opencode."
+    [[ -f "${stage}/package/bin/opencode" && ! -L "${stage}/package/bin/opencode" ]] \
+        || fail "OpenCode archive entry package/bin/opencode is not a regular file."
     chmod 0755 "${stage}/package/bin/opencode"
 
     local verified_ver
@@ -627,10 +685,12 @@ install_pi() {
     printf '%s  %s\n' "${expected}" "${stage}/${archive}" | sha256sum -c --quiet \
         || fail "Pi archive SHA-256 checksum verification failed."
 
-    tar -xzf "${stage}/${archive}" --no-same-owner -C "${stage}/extract"
+    tar -xzf "${stage}/${archive}" --no-same-owner --no-same-permissions -C "${stage}/extract"
     [[ -f "${stage}/extract/pi/pi" && ! -L "${stage}/extract/pi/pi" ]] \
         || fail "Pi archive does not contain pi/pi executable."
-    chmod -R u=rwX,go=rX "${stage}/extract/pi"
+    chmod -R a-s,u=rwX,go=rX "${stage}/extract/pi"
+    chmod 0755 "${stage}/extract/pi/pi"
+    chown -R root:root "${stage}/extract/pi"
 
     local verified_ver
     verified_ver="$(run_pi_isolated "${stage}/home" "${stage}/extract/pi/pi" --version)" \
@@ -638,12 +698,15 @@ install_pi() {
     [[ "${verified_ver}" == "${resolved}" ]] \
         || fail "Pi self-test returned '${verified_ver}', expected '${resolved}'."
 
-    install -d -m 0755 "${APP_ROOT}"
     if [[ -e "${app_dir}" || -L "${app_dir}" ]]; then
         mv "${app_dir}" "${stage}/previous"
     fi
-    mv "${stage}/extract/pi" "${app_dir}"
-    chown -R root:root "${app_dir}"
+    if ! mv "${stage}/extract/pi" "${app_dir}"; then
+        if [[ -e "${stage}/previous" || -L "${stage}/previous" ]]; then
+            mv "${stage}/previous" "${app_dir}" || true
+        fi
+        fail "failed to install Pi into ${app_dir}."
+    fi
     ln -sfn "${app_dir}/pi" "${cli_path}"
 
     if [[ "$(run_pi_isolated "${stage}/home" "${cli_path}" --version 2>/dev/null || true)" != "${resolved}" ]]; then
@@ -683,7 +746,7 @@ install_antigravity() {
         fail "unexpected Antigravity archive URL '${url}'."
     fi
     digest="$(jq -r '.sha512 | strings' "${stage}/manifest.json")"
-    [[ "${digest}" =~ ^[0-9a-f]{128}$ ]] || fail "invalid SHA-512 digest in Antigravity manifest."
+    [[ "${digest}" =~ ^[0-9a-fA-F]{128}$ ]] || fail "invalid SHA-512 digest in Antigravity manifest."
 
     if [[ -x "${app_dir}/agy" ]]; then
         installed="$(HOME="${stage}/home" "${app_dir}/agy" --version 2>/dev/null || true)"
@@ -694,7 +757,7 @@ install_antigravity() {
         printf '%s  %s\n' "${digest}" "${stage}/archive.tar.gz" | sha512sum -c --quiet \
             || fail "Antigravity CLI SHA-512 checksum verification failed."
 
-        tar -xzf "${stage}/archive.tar.gz" --no-same-owner -C "${stage}/payload"
+        tar -xzf "${stage}/archive.tar.gz" --no-same-owner --no-same-permissions -C "${stage}/payload"
         [[ -f "${stage}/payload/antigravity" && ! -L "${stage}/payload/antigravity" ]] \
             || fail "Antigravity archive lacks antigravity binary."
         chmod 0755 "${stage}/payload/antigravity"
@@ -712,13 +775,14 @@ install_antigravity() {
         log "Antigravity CLI ${version} is already installed."
     fi
 
-    cat > /usr/local/bin/agy <<'EOF'
+    cat > "${stage}/agy-wrapper" <<'EOF'
 #!/usr/bin/env bash
-umask 077
+export AGY_CLI_DISABLE_AUTO_UPDATE=true
 exec /usr/local/share/coding-agents/antigravity/agy "$@"
 EOF
-    chmod 0755 /usr/local/bin/agy
-    chown root:root /usr/local/bin/agy
+    chmod 0755 "${stage}/agy-wrapper"
+    chown root:root "${stage}/agy-wrapper"
+    mv -f "${stage}/agy-wrapper" /usr/local/bin/agy
 }
 
 link_state_dir() {
@@ -760,7 +824,7 @@ prepare_runtime_and_state() {
         install -d -m 0700 -o "${REMOTE_USER}" -g "${REMOTE_GROUP}" "${STATE_DIR}"
     fi
 
-    local agent entry kind rel_root rel_path subdir
+    local agent entry kind rel_root rel_path subdir rest pmode
     for agent in "${ENABLED_AGENTS[@]}"; do
         case "${agent}" in
             claude-code)
@@ -785,9 +849,9 @@ prepare_runtime_and_state() {
                 install -d -m 0700 -o "${REMOTE_USER}" -g "${REMOTE_GROUP}" "${STATE_DIR}/antigravity"
                 for entry in ".gemini/antigravity-cli:cli:0700" ".gemini/config:gemini-config:0700" ".config/antigravity:plugin-secrets:0755"; do
                     rel_path="${entry%%:*}"
-                    local rest="${entry#*:}"
+                    rest="${entry#*:}"
                     subdir="${rest%%:*}"
-                    local pmode="${rest#*:}"
+                    pmode="${rest#*:}"
                     link_state_dir "${REMOTE_HOME}/${rel_path}" "${STATE_DIR}/antigravity/${subdir}" "${pmode}"
                 done
                 ;;
@@ -799,11 +863,15 @@ main() {
     log "starting installation..."
     validate_options
     detect_platform
-    check_state_conflicts
     install_prerequisites
+    check_state_conflicts
 
-    WORK_DIR="$(mktemp -d /tmp/.coding-agents-install.XXXXXX)"
+    install -d -m 0755 /usr/local/bin "${APP_ROOT}"
+    WORK_DIR="$(mktemp -d "${APP_ROOT}/.install.XXXXXX")"
+    chmod 0700 "${WORK_DIR}"
     trap cleanup EXIT
+    trap 'exit 130' INT
+    trap 'exit 143' TERM
 
     local agent
     for agent in "${ENABLED_AGENTS[@]}"; do
@@ -821,4 +889,3 @@ main() {
 }
 
 main "$@"
-

@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 # Initializes and verifies project-scoped persistent state under /var/lib/coding-agents
-# once per container creation as the remote user. If volume ownership or permissions need
-# repair, delegates `--repair <uid> <gid>` through noninteractive sudo without following
+# once per container creation as the remote user. Missing subdirectories and loose modes on
+# user-owned entries are fixed directly without privilege escalation; only an ownership
+# mismatch delegates `--repair` through noninteractive sudo without following external
 # symlinks outside /var/lib/coding-agents.
 set -euo pipefail
 umask 077
+export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 
 readonly STATE_DIR="/var/lib/coding-agents"
 readonly SELF_PATH="/usr/local/share/coding-agents-feature/initialize"
@@ -110,7 +112,7 @@ list_credential_files() {
                 printf '%s\n' "codex/auth.json" "codex/config.toml"
                 ;;
             opencode)
-                printf '%s\n' "opencode/data/opencode.db" "opencode/data/opencode.db-wal" "opencode/data/opencode.db-shm"
+                printf '%s\n' "opencode/data/opencode.db" "opencode/data/opencode.db-wal" "opencode/data/opencode.db-shm" "opencode/data/auth.json"
                 ;;
             pi)
                 printf '%s\n' "pi/agent/auth.json" "pi/agent/mcp-auth.json"
@@ -128,17 +130,30 @@ check_state_links() {
         [[ -n "${rel}" ]] || continue
         [[ ! -L "${STATE_DIR}/${rel}" ]] \
             || fail "${STATE_DIR}/${rel} is a symlink; preserve it and resolve the state mapping manually."
-    done < <(list_state_subdirs; list_credential_files)
+        if [[ -e "${STATE_DIR}/${rel}" && ! -d "${STATE_DIR}/${rel}" ]]; then
+            fail "${STATE_DIR}/${rel} exists and is not a directory."
+        fi
+    done < <(list_state_subdirs)
+
+    while IFS= read -r rel; do
+        [[ -n "${rel}" ]] || continue
+        [[ ! -L "${STATE_DIR}/${rel}" ]] \
+            || fail "${STATE_DIR}/${rel} is a symlink; preserve it and resolve the state mapping manually."
+        if [[ -d "${STATE_DIR}/${rel}" ]]; then
+            fail "${STATE_DIR}/${rel} is a directory where a credential file is expected."
+        fi
+    done < <(list_credential_files)
 }
 
 effective_xdg_root() {
     local kind="$1"
+    local home_base="${HOME%/}"
     local root=""
     case "${kind}" in
-        data) root="${XDG_DATA_HOME:-${HOME}/.local/share}" ;;
-        config) root="${XDG_CONFIG_HOME:-${HOME}/.config}" ;;
-        state) root="${XDG_STATE_HOME:-${HOME}/.local/state}" ;;
-        cache) root="${XDG_CACHE_HOME:-${HOME}/.cache}" ;;
+        data) root="${XDG_DATA_HOME:-${home_base}/.local/share}" ;;
+        config) root="${XDG_CONFIG_HOME:-${home_base}/.config}" ;;
+        state) root="${XDG_STATE_HOME:-${home_base}/.local/state}" ;;
+        cache) root="${XDG_CACHE_HOME:-${home_base}/.cache}" ;;
     esac
     [[ "${root}" == /* ]] || fail "effective XDG ${kind} root ('${root}') must be an absolute path."
     printf '%s\n' "${root}"
@@ -155,11 +170,20 @@ check_home_link() {
     fi
 }
 
+check_outside_state_dir() {
+    local path="$1"
+    local label="$2"
+    local canon
+    canon="$(readlink -m "${path}")"
+    [[ "${canon}" != "${STATE_DIR}" && "${canon}" != "${STATE_DIR}"/* ]] \
+        || fail "${label} ('${path}') must not reside inside ${STATE_DIR}."
+}
+
 check_home_conflicts() {
     local home_path="${HOME%/}"
 
     if agent_enabled "claude-code"; then
-        [[ -z "${CLAUDE_CONFIG_DIR+x}" ]] \
+        [[ -z "${CLAUDE_CONFIG_DIR+x}" || "${CLAUDE_CONFIG_DIR}" == "${STATE_DIR}/claude-code" ]] \
             || fail "CLAUDE_CONFIG_DIR is set; remove the override and rerun initialization."
         [[ ! -e "${home_path}/.claude.json" && ! -L "${home_path}/.claude.json" ]] \
             || fail "existing '${home_path}/.claude.json' is outside the mapped directory; migrate it explicitly."
@@ -178,13 +202,12 @@ check_home_conflicts() {
         local kind root canon
         for kind in "${kinds[@]}"; do
             root="$(effective_xdg_root "${kind}")"
-            if [[ -e "${root}" && ! -d "${root}" ]]; then
+            if [[ ( -e "${root}" || -L "${root}" ) && ! -d "${root}" ]]; then
                 fail "'${root}' is not a directory."
             fi
             check_home_link "${root}/opencode" "${STATE_DIR}/opencode/${kind}"
+            check_outside_state_dir "${root}" "XDG ${kind} root"
             canon="$(readlink -m "${root}")"
-            [[ "${canon}" != "${STATE_DIR}" && "${canon}" != "${STATE_DIR}"/* ]] \
-                || fail "XDG ${kind} root '${root}' must not reside inside ${STATE_DIR}."
             roots+=("${canon}")
         done
         local i j inner
@@ -207,10 +230,7 @@ check_home_conflicts() {
         [[ -z "${PI_CODING_AGENT_DIR:-}" ]] \
             || fail "PI_CODING_AGENT_DIR is set; remove it so Pi uses ~/.pi/agent."
         local pi_parent="${home_path}/.pi"
-        local pi_canon
-        pi_canon="$(readlink -m "${pi_parent}")"
-        [[ "${pi_canon}" != "${STATE_DIR}" && "${pi_canon}" != "${STATE_DIR}"/* ]] \
-            || fail "'${pi_parent}' must not reside inside ${STATE_DIR}."
+        check_outside_state_dir "${pi_parent}" "Pi parent directory"
         if [[ ( -e "${pi_parent}" || -L "${pi_parent}" ) && ! -d "${pi_parent}" ]]; then
             fail "'${pi_parent}' is not a directory."
         fi
@@ -218,18 +238,34 @@ check_home_conflicts() {
     fi
 
     if agent_enabled "antigravity"; then
-        local config_home
+        local config_home gemini_dir
         config_home="$(effective_xdg_root "config")"
-        if [[ -e "${config_home}" && ! -d "${config_home}" ]]; then
+        gemini_dir="${home_path}/.gemini"
+        check_outside_state_dir "${config_home}" "XDG config root"
+        check_outside_state_dir "${gemini_dir}" "Antigravity parent directory"
+        if [[ ( -e "${config_home}" || -L "${config_home}" ) && ! -d "${config_home}" ]]; then
             fail "'${config_home}' is not a directory."
         fi
-        if [[ -e "${home_path}/.gemini" && ! -d "${home_path}/.gemini" ]]; then
-            fail "'${home_path}/.gemini' is not a directory."
+        if [[ ( -e "${gemini_dir}" || -L "${gemini_dir}" ) && ! -d "${gemini_dir}" ]]; then
+            fail "'${gemini_dir}' is not a directory."
         fi
-        check_home_link "${home_path}/.gemini/antigravity-cli" "${STATE_DIR}/antigravity/cli"
-        check_home_link "${home_path}/.gemini/config" "${STATE_DIR}/antigravity/gemini-config"
+        check_home_link "${gemini_dir}/antigravity-cli" "${STATE_DIR}/antigravity/cli"
+        check_home_link "${gemini_dir}/config" "${STATE_DIR}/antigravity/gemini-config"
         check_home_link "${config_home}/antigravity" "${STATE_DIR}/antigravity/plugin-secrets"
     fi
+}
+
+ownership_matches_uid() {
+    local uid="$1"
+    local rel
+    [[ "$(stat -c '%u' "${STATE_DIR}")" == "${uid}" ]] || return 1
+
+    while IFS= read -r rel; do
+        [[ -n "${rel}" ]] || continue
+        if [[ -e "${STATE_DIR}/${rel}" ]]; then
+            [[ "$(stat -c '%u' "${STATE_DIR}/${rel}")" == "${uid}" ]] || return 1
+        fi
+    done < <(list_state_subdirs; list_credential_files)
 }
 
 state_is_healthy() {
@@ -252,31 +288,47 @@ state_is_healthy() {
     done < <(list_credential_files)
 }
 
-repair_state() {
-    local uid="$1"
-    local gid="$2"
-    local rel need_chown=false
+repair_owned_state() {
+    local rel
+    chmod 00700 "${STATE_DIR}"
+    while IFS= read -r rel; do
+        [[ -n "${rel}" ]] || continue
+        if [[ ! -e "${STATE_DIR}/${rel}" ]]; then
+            install -d -m 0700 "${STATE_DIR}/${rel}"
+        fi
+        chmod 00700 "${STATE_DIR}/${rel}"
+    done < <(list_state_subdirs)
 
-    [[ "$(id -u)" == "0" && "${uid}" =~ ^[0-9]+$ && "${gid}" =~ ^[0-9]+$ ]] \
-        || fail "invalid repair identity; rerun ${SELF_PATH} as the remote user."
+    while IFS= read -r rel; do
+        [[ -n "${rel}" ]] || continue
+        if [[ -f "${STATE_DIR}/${rel}" && ! -L "${STATE_DIR}/${rel}" ]]; then
+            chmod 0600 -- "${STATE_DIR}/${rel}"
+        fi
+    done < <(list_credential_files)
+}
+
+repair_state() {
+    export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+    local uid gid rel
+
+    [[ "$(id -u)" == "0" ]] \
+        || fail "privileged repair must run as root; rerun ${SELF_PATH} as the remote user."
+
+    if [[ -n "${SUDO_UID+x}" ]]; then
+        uid="${SUDO_UID}"
+        gid="${SUDO_GID:-}"
+        [[ "${uid}" =~ ^[0-9]+$ && "${uid}" != "0" && "${gid}" =~ ^[0-9]+$ ]] \
+            || fail "invalid sudo caller identity; rerun ${SELF_PATH} as a non-root user."
+    else
+        uid="0"
+        gid="0"
+    fi
 
     load_enabled_agents
     require_mount
     check_state_links
 
-    if [[ "$(stat -c '%u' "${STATE_DIR}")" != "${uid}" ]]; then
-        need_chown=true
-    else
-        while IFS= read -r rel; do
-            [[ -n "${rel}" ]] || continue
-            if [[ -e "${STATE_DIR}/${rel}" && "$(stat -c '%u' "${STATE_DIR}/${rel}")" != "${uid}" ]]; then
-                need_chown=true
-                break
-            fi
-        done < <(list_state_subdirs; list_credential_files)
-    fi
-
-    if [[ "${need_chown}" == "true" ]]; then
+    if ! ownership_matches_uid "${uid}"; then
         log "repairing ownership inside ${STATE_DIR} for UID ${uid}..."
         find -P "${STATE_DIR}" -xdev -exec chown -h "${uid}:${gid}" -- {} +
         find -P "${STATE_DIR}" -xdev -type d -exec chmod 00700 -- {} +
@@ -356,10 +408,9 @@ create_home_links() {
 }
 
 initialize_state() {
-    local uid gid
+    local uid
     uid="$(id -u)"
-    gid="$(id -g)"
-    [[ "${HOME:-}" == /* && -d "${HOME}" ]] \
+    [[ "${HOME:-}" == /* && "${HOME}" != "/" && -d "${HOME}" ]] \
         || fail "remote-user HOME is unavailable; fix HOME and rerun ${SELF_PATH}."
 
     load_enabled_agents
@@ -369,11 +420,13 @@ initialize_state() {
 
     if ! state_is_healthy "${uid}"; then
         if [[ "${uid}" == "0" ]]; then
-            repair_state "${uid}" "${gid}"
+            repair_state
+        elif ownership_matches_uid "${uid}"; then
+            repair_owned_state
         else
             command -v sudo >/dev/null 2>&1 \
                 || fail "state repair requires noninteractive sudo; restore ${STATE_DIR} ownership to UID ${uid} manually."
-            sudo --non-interactive "${SELF_PATH}" --repair "${uid}" "${gid}" \
+            sudo -n "${SELF_PATH}" --repair \
                 || fail "state repair failed; grant noninteractive sudo or restore ${STATE_DIR} ownership to UID ${uid}."
         fi
         state_is_healthy "${uid}" || fail "${STATE_DIR} is still not private to UID ${uid}; repair it manually."
@@ -385,8 +438,8 @@ initialize_state() {
 }
 
 main() {
-    if [[ "$#" -eq 3 && "$1" == "--repair" ]]; then
-        repair_state "$2" "$3"
+    if [[ "$#" -eq 1 && "$1" == "--repair" ]]; then
+        repair_state
     elif [[ "$#" -eq 0 ]]; then
         initialize_state
     else
@@ -395,4 +448,3 @@ main() {
 }
 
 main "$@"
-

@@ -10,7 +10,7 @@ This Feature installs popular CLI coding agents from their verified official nat
 | Pi | `pi` | `installPi`, `piVersion` | Release `SHA256SUMS` (glibc Linux only) |
 | Antigravity | `agy` | `installAntigravity` | Official platform manifest SHA-512 (`AGY_CLI_DISABLE_AUTO_UPDATE=true`) |
 
-All installed binaries are placed on `/usr/local/bin` with a private `umask 077` launcher where applicable so newly created state files stay owner-readable only.
+All installed binaries are placed on `/usr/local/bin` without altering workspace file `umask`.
 
 ## Project-Scoped State Persistence
 
@@ -32,7 +32,7 @@ The `onCreateCommand` hook (`/usr/local/share/coding-agents-feature/initialize`)
 
 - Confirms `/var/lib/coding-agents` is a mounted volume and enforces private permissions (`0700` on directories, `0600` on known credential files).
 - Refuses to overwrite existing non-matching files, directories, or symlinks at mapped paths or conflicting environment overrides (`CLAUDE_CONFIG_DIR`, `CODEX_HOME`, `PI_CODING_AGENT_DIR`).
-- Repairs volume ownership via noninteractive `sudo` inside `/var/lib/coding-agents` only (without following external symlinks) if the remote user UID changed.
+- Repairs missing subdirectories and loose permissions directly as the remote user when the volume is already owned by that user, and only invokes noninteractive `sudo` (`--repair` deriving target UID/GID from `SUDO_UID`/`SUDO_GID`) inside `/var/lib/coding-agents` when volume ownership differs from the remote user.
 
 ## Authentication & Migration
 
@@ -43,4 +43,3 @@ To inspect which Docker volume a container uses:
 ```sh
 docker inspect <CONTAINER_ID> --format '{{range .Mounts}}{{if eq .Destination "/var/lib/coding-agents"}}{{.Name}}{{end}}{{end}}'
 ```
-
