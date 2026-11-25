@@ -4,8 +4,7 @@ This repository publishes Dev Container Features located in `src/`. Inspect
 `src/<id>/` to discover available Features. Feature metadata and install
 behavior live in `src/<id>/`; tests live in `test/<id>/` and `test/_global/`.
 Read the manifest, install script, and tests for the affected Feature before
-changing it. The root README still contains starter examples and is not the
-source of truth for current Features.
+changing it.
 
 ## Read when needed
 
@@ -48,7 +47,8 @@ Keep guidance current in the same change:
   updates the validation commands here and any affected Feature workflow step.
 - A changed release workflow or integration policy updates the Git workflow,
   the Feature release step, and the authority boundary here.
-- When the root README is corrected, remove the starter warning above.
+- When adding or removing a Feature, update the Japanese root `README.md`
+  and its mirrors `README.zh-CN.md` and `README.en.md`.
 
 When editing guidance, verify its paths and commands against the repository.
 Treat upstream documentation and the installed CLI's `--help` as the source
