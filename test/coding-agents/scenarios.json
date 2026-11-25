@@ -1,0 +1,22 @@
+{
+    "selective_agents": {
+        "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+        "features": {
+            "coding-agents": {
+                "installClaudeCode": false,
+                "installCodex": true,
+                "codexVersion": "0.172.0",
+                "installOpenCode": true,
+                "openCodeVersion": "2.4.1",
+                "installPi": false,
+                "installAntigravity": false
+            }
+        }
+    },
+    "debian": {
+        "image": "mcr.microsoft.com/devcontainers/base:debian",
+        "features": {
+            "coding-agents": {}
+        }
+    }
+}
