@@ -1,57 +1,72 @@
 # Agent guide
 
-This repository publishes Dev Container Features located in `src/`. Inspect
-`src/<id>/` to discover available Features. Feature metadata and install
-behavior live in `src/<id>/`; tests live in `test/<id>/` and `test/_global/`.
-Read the manifest, install script, and tests for the affected Feature before
-changing it.
+A collection of Dev Container Features located in `src/`, tested in `test/`,
+and published independently to `ghcr.io/minato-ryan/devcontainer-features/<id>`.
+Inspect `src/<id>/` to discover available Features, and read the manifest,
+install script, and tests for the affected Feature before changing it.
 
-## Read when needed
+## Project map
 
-- Read [the Feature workflow](.agents/skills/devcontainer-feature-workflow/SKILL.md)
-  when adding a Feature or changing its metadata, installer, tests, version,
-  or release documentation.
-- Read [the reference index](.agents/knowledge/reference-index.md) when
-  checking Dev Container semantics, CLI flags, GitHub Actions behavior, or
-  tool syntax. Follow its topic-specific links rather than relying on a
-  remembered command.
-- Read [the Git workflow](.agents/knowledge/git-workflow.md) before creating a
-  branch, writing a commit, working on a PR, tagging, or preparing a release.
+```text
+src/<id>/          <- Feature metadata (devcontainer-feature.json), install.sh, optional NOTES.md, generated README.md
+test/<id>/         <- Feature tests: test.sh, scenarios.json + <scenario>.sh
+test/_global/      <- Multi-Feature global scenarios
+.github/           <- Workflows (test, validate, secret scanning, release), local actions, Issue forms, PR template
+.devcontainer/     <- Development container configuration
+.agents/knowledge/ <- Agent knowledge base, routed from the table below
+.agents/skills/    <- Project skills (mirrored to Claude Code via symlinks in .claude/skills/)
+```
+
+## Core conventions
+
+- Never hand-edit generated `src/*/README.md`: the release workflow generates
+  it from the manifest and `NOTES.md`.
+- Do not attribute commits, issues, or pull requests to AI tools (no
+  `Co-authored-by:` trailers or tool-generated markers).
+- The repository is public: credentials, tokens, private hostnames, and PII
+  never enter a file, commit, issue, or pull request. Never bypass pre-commit
+  hooks (`--no-verify`). Every delegated `git push` or public GitHub write must
+  pass `.agents/knowledge/publish-gate.md`.
+- Agents inspect, edit, and validate locally. A maintainer decides when to
+  commit, push, open or merge (squash merge) a PR, and trigger the manual
+  release workflow, unless a maintainer explicitly delegates an action.
+- Root documentation uses the Japanese `README.md` and its mirrors
+  `README.zh-CN.md` and `README.en.md`.
+
+## When to read what
+
+| Situation | Read |
+| --- | --- |
+| Adding a Feature or changing its manifest, installer, tests, version, or release notes | `.agents/skills/devcontainer-feature-workflow/SKILL.md` |
+| Creating a branch, writing a commit, working on a PR, tagging, or preparing a release | `.agents/knowledge/git-workflow.md` |
+| Delegated `git push` or any GitHub write (Issue, PR, comment, review reply) | `.agents/knowledge/publish-gate.md` |
+| Checking Dev Container semantics, CLI flags, GitHub Actions behavior, or tool syntax | `.agents/knowledge/reference-index.md` |
+| This file passes ~120 lines, every ~10 merged Feature PRs, or a rule turns out stale | `.agents/knowledge/harness-review.md` |
 
 ## Validate changes
 
-- `just lint`: run the repository's Pre-commit checks. It requires
-  Pre-commit and ShellCheck.
-- `just test-feature <id>`: test one Feature's defaults and scenarios.
-- `just test-global`: run global scenarios.
-- `just test`: test all Features and global scenarios.
-- Feature tests require the Dev Container CLI and a working Docker daemon.
-  Metadata validation also runs in the pull-request `validate` workflow, and
-  `.github/workflows/test.yaml` auto-discovers Features from `src/` to test
-  only changed Features (and affected global scenarios) on push/PR or all
-  Features on `workflow_dispatch`.
+| Check | Command |
+| --- | --- |
+| Pre-commit checks (requires Pre-commit and ShellCheck) | `just lint` |
+| One Feature's defaults and scenarios | `just test-feature <id>` |
+| Global scenarios | `just test-global` |
+| All Features and global scenarios | `just test` |
 
-Agents may inspect, edit, and validate locally. A maintainer decides when to
-commit, push, open or merge a PR, and trigger the manual release workflow,
-unless a later task explicitly delegates one of those actions. Because this is
-a public repository, scrubbing sensitive data after publication is rarely
-complete. Before committing, pushing, or publishing any Issue or PR, agents
-must explicitly inspect all diffs, messages, titles, bodies, and command output
-for secrets (API keys, tokens, credentials, private keys) and personal
-identifiable information (PII such as personal emails, real names, or private
-hostnames). Pre-commit hooks—including Gitleaks secret scanning—must never be
-bypassed under any circumstance (e.g. no `--no-verify`).
+Feature tests require the Dev Container CLI and a working Docker daemon.
+Metadata validation runs in `.github/workflows/validate.yml`, and
+`.github/workflows/test.yaml` auto-discovers Features from `src/` to test
+only changed Features (and affected global scenarios) on push/PR or all
+Features on `workflow_dispatch`.
 
-Keep guidance current in the same change:
+## Keep in sync
 
-- A changed Feature or test layout updates this guide and the Feature
-  workflow.
-- A changed `justfile`, Pre-commit config, devcontainer setup, or test CI job
-  updates the validation commands here and any affected Feature workflow step.
-- A changed release workflow or integration policy updates the Git workflow,
-  the Feature release step, and the authority boundary here.
-- When adding or removing a Feature, update the Japanese root `README.md`
-  and its mirrors `README.zh-CN.md` and `README.en.md`.
+| When this changes | Update in the same change |
+| --- | --- |
+| A knowledge file or skill is added, renamed, or removed | "When to read what" table here and `.claude/skills/` symlink |
+| Feature or test layout | `AGENTS.md` and `devcontainer-feature-workflow` skill |
+| `justfile`, Pre-commit config, devcontainer setup, or test CI job | Validation table here, `.github/pull_request_template.md`, and affected skill steps |
+| Release workflow, merge policy, or authority boundary | `.agents/knowledge/git-workflow.md`, `AGENTS.md`, and affected skill steps |
+| A Feature is added or removed | Japanese root `README.md` and its mirrors `README.zh-CN.md` and `README.en.md` |
 
 When editing guidance, verify its paths and commands against the repository.
 Treat upstream documentation and the installed CLI's `--help` as the source

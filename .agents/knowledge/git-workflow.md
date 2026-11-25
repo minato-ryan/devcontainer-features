@@ -10,13 +10,16 @@ configured by maintainers.
   a short-lived branch from the relevant GitHub Issue using GitHub's branch
   creation flow; agents work on the provided branch.
 - Use English Conventional Commits: a lowercase type such as `feat`, `fix`,
-  `docs`, or `chore`, followed by an imperative description. Keep the title at
-  most 50 characters without a final period; keep body lines at most 72
-  characters. Do not attribute commits to AI tools.
-- Integrate through a PR after the relevant CI checks pass and a maintainer
-  approves it. Use a squash merge; GitHub automatically deletes the
-  short-lived branch after merge. `main` protection and required checks are
-  maintainer-managed GitHub settings.
+  `docs`, or `chore`, an optional scope (such as the Feature id or area like
+  `ci`, `agents`, `devcontainer`, `docs`), followed by an imperative
+  description. Keep the title at most 50 characters without a final period;
+  keep body lines at most 72 characters. Do not attribute commits to AI tools.
+- Integrate through a PR built from `.github/pull_request_template.md` after the
+  relevant CI checks pass and a maintainer approves it. Use a squash merge;
+  GitHub automatically deletes the short-lived branch after merge. `main`
+  protection and required checks are maintainer-managed GitHub settings. When a
+  maintainer (or an explicitly delegated task) creates an Issue, use the forms
+  in `.github/ISSUE_TEMPLATE/`.
 - Treat urgent fixes the same way: branch from `main`, validate, merge through
   a PR, then let a maintainer publish the affected Feature.
 - Version each Feature independently in its `devcontainer-feature.json`.
@@ -33,11 +36,14 @@ configured by maintainers.
     tokens, private keys, passwords, authentication headers).
   - Inspect for personal identifiable information (PII) such as personal email
     addresses, real names, phone numbers, or private internal network hosts.
+  - Every delegated `git push` and every delegated GitHub write (Issue, PR,
+    comment, or review reply) must also pass the Clean-context Publish Gate in
+    `.agents/knowledge/publish-gate.md` before publication.
 - Never bypass Pre-commit hooks under any circumstance (such as passing
   `--no-verify` or `-n` to `git commit`, or skipping hooks). All hooks,
   especially secret scanning with `gitleaks`, must execute and pass cleanly.
   If a hook fails, diagnose and resolve the underlying issue properly.
 
-Agents stop at local changes and validation unless the task explicitly
+Agents stop at local changes and validation unless a maintainer explicitly
 delegates a Git or GitHub action. If branch, merge, release, or approval policy
 changes, update this file alongside the affected workflow or setting.

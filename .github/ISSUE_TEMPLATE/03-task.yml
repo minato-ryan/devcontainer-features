@@ -1,0 +1,38 @@
+name: Task
+description: Planned work that is neither a Feature nor a bug — CI, agent guidance, the dev container, or upkeep.
+body:
+  - type: textarea
+    id: content
+    attributes:
+      label: Content
+      description: The planned change, precisely.
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Outcome
+      description: The observable repository state when this task is complete.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: Checks that demonstrate the outcome holds.
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Context and references
+      description: Discussion, reference files, and constraints outside this issue.
+    validations:
+      required: false
+  - type: textarea
+    id: out-of-scope
+    attributes:
+      label: Out of scope
+      description: Adjacent work this task must not absorb.
+    validations:
+      required: false

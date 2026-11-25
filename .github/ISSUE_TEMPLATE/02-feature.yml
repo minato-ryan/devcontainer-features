@@ -1,0 +1,47 @@
+name: Feature request
+description: A new Feature for the collection, or a new capability or behavior change of an existing one.
+body:
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Kind
+      options:
+        - New Feature
+        - Change to an existing Feature
+    validations:
+      required: true
+  - type: input
+    id: feature
+    attributes:
+      label: Feature
+      description: The existing Feature id, or the proposed id (lowercase words joined by hyphens).
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Outcome
+      description: What becomes possible, and for whom, when this exists.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: How we observe this is done — options, supported base images, install behavior, and verification criteria.
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Context and references
+      description: The upstream project, official install docs and releases, checksums or signatures, and alternatives considered.
+    validations:
+      required: false
+  - type: textarea
+    id: out-of-scope
+    attributes:
+      label: Out of scope
+      description: What this request deliberately does not cover.
+    validations:
+      required: false
