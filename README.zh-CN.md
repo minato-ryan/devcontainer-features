@@ -18,7 +18,7 @@
 <p>
   <a href="https://github.com/minato-ryan/devcontainer-features/actions/workflows/test.yaml"><img src="https://github.com/minato-ryan/devcontainer-features/actions/workflows/test.yaml/badge.svg" alt="Test Features" /></a>
   <a href="https://github.com/minato-ryan/devcontainer-features/actions/workflows/validate.yml"><img src="https://github.com/minato-ryan/devcontainer-features/actions/workflows/validate.yml/badge.svg" alt="Validate Metadata" /></a>
-  <img src="https://img.shields.io/badge/Features-9-0EA5E9?style=flat-square" alt="Features: 9" />
+  <img src="https://img.shields.io/badge/Features-10-0EA5E9?style=flat-square" alt="Features: 10" />
   <img src="https://img.shields.io/badge/Registry-GHCR-6366F1?style=flat-square&amp;logo=github" alt="Registry: GHCR" />
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-10B981?style=flat-square" alt="License: MIT" /></a>
 </p>
@@ -57,6 +57,11 @@
       <td><a href="src/chezmoi/README.md"><strong>chezmoi</strong></a><br /><sub>Dotfiles</sub></td>
       <td>安装并初始化配置 chezmoi<br /><sub>选项: <code>config</code> ・ 依赖: <code>common-utils</code></sub></td>
       <td><code>ghcr.io/minato-ryan/devcontainer-features/chezmoi:1</code></td>
+    </tr>
+    <tr>
+      <td><a href="src/colab/README.md"><strong>colab</strong></a><br /><sub>AI / Cloud</sub></td>
+      <td>安装 Google Colab CLI（<code>colab</code>）与 <code>rclone</code>，提供 <code>colab-adc</code> 认证助手与项目级 ADC 凭据持久化<br /><sub>选项: <code>version</code>, <code>defaultAuth</code>, <code>installRclone</code>, <code>rcloneVersion</code>, <code>installRcloneMountDependencies</code> ・ 依赖: <code>uv</code> ・ 卷: <code>/var/lib/colab</code></sub></td>
+      <td><code>ghcr.io/minato-ryan/devcontainer-features/colab:1</code></td>
     </tr>
     <tr>
       <td><a href="src/deno/README.md"><strong>deno</strong></a><br /><sub>Runtime</sub></td>

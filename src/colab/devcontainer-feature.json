@@ -1,0 +1,70 @@
+{
+    "id": "colab",
+    "version": "1.0.0",
+    "name": "Google Colab CLI (colab)",
+    "description": "Installs Google Colab CLI (colab) and rclone, persists project-scoped Application Default Credentials (ADC) and CLI configuration in a private volume, and provides the colab-adc helper command.",
+    "documentationURL": "https://github.com/minato-ryan/devcontainer-features/tree/main/src/colab",
+    "options": {
+        "version": {
+            "type": "string",
+            "proposals": [
+                "latest",
+                "0.8.0",
+                "0.7.6"
+            ],
+            "default": "latest",
+            "description": "Google Colab CLI (google-colab-cli) release to install ('latest' or an exact MAJOR.MINOR.PATCH version)."
+        },
+        "defaultAuth": {
+            "type": "string",
+            "enum": [
+                "adc",
+                "oauth2"
+            ],
+            "default": "adc",
+            "description": "Default authentication strategy injected by the colab wrapper when --auth is omitted ('adc' or 'oauth2')."
+        },
+        "installRclone": {
+            "type": "boolean",
+            "default": true,
+            "description": "Install signature-verified rclone with bash, zsh, and fish shell completions."
+        },
+        "rcloneVersion": {
+            "type": "string",
+            "proposals": [
+                "latest",
+                "1.76.0",
+                "1.70.0"
+            ],
+            "default": "latest",
+            "description": "rclone version to install when installRclone is true ('latest' or MAJOR.MINOR.PATCH >= 1.63.0)."
+        },
+        "installRcloneMountDependencies": {
+            "type": "boolean",
+            "default": false,
+            "description": "Install fuse3 (fusermount3) required by rclone mount when installRclone is true."
+        }
+    },
+    "dependsOn": {
+        "ghcr.io/minato-ryan/devcontainer-features/uv:1": {}
+    },
+    "installsAfter": [
+        "ghcr.io/devcontainers/features/common-utils",
+        "ghcr.io/minato-ryan/devcontainer-features/uv"
+    ],
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "google.colab"
+            ]
+        }
+    },
+    "mounts": [
+        {
+            "source": "colab-${devcontainerId}",
+            "target": "/var/lib/colab",
+            "type": "volume"
+        }
+    ],
+    "onCreateCommand": "/usr/local/share/colab-feature/initialize"
+}

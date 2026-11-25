@@ -3,3 +3,7 @@ devcontainer-lock.json
 
 ### Skills Lock ###
 skills-lock.json
+
+### Python ###
+__pycache__/
+*.py[cod]
