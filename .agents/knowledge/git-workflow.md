@@ -10,9 +10,10 @@ configured by maintainers.
   a short-lived branch from the relevant GitHub Issue using GitHub's branch
   creation flow; agents work on the provided branch.
 - Use English Conventional Commits: a lowercase type such as `feat`, `fix`,
-  `docs`, or `chore`, followed by an imperative description. Keep the title at
-  most 50 characters without a final period; keep body lines at most 72
-  characters. Do not attribute commits to AI tools.
+  `docs`, or `chore`, an optional scope (such as the Feature id or area like
+  `ci`, `agents`, `devcontainer`, `docs`), followed by an imperative
+  description. Keep the title at most 50 characters without a final period;
+  keep body lines at most 72 characters. Do not attribute commits to AI tools.
 - Integrate through a PR built from `.github/pull_request_template.md` after the
   relevant CI checks pass and a maintainer approves it. Use a squash merge;
   GitHub automatically deletes the short-lived branch after merge. `main`
@@ -43,6 +44,6 @@ configured by maintainers.
   especially secret scanning with `gitleaks`, must execute and pass cleanly.
   If a hook fails, diagnose and resolve the underlying issue properly.
 
-Agents stop at local changes and validation unless the task explicitly
+Agents stop at local changes and validation unless a maintainer explicitly
 delegates a Git or GitHub action. If branch, merge, release, or approval policy
 changes, update this file alongside the affected workflow or setting.

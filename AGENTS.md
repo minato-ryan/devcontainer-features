@@ -29,7 +29,7 @@ test/_global/      <- Multi-Feature global scenarios
   pass `.agents/knowledge/publish-gate.md`.
 - Agents inspect, edit, and validate locally. A maintainer decides when to
   commit, push, open or merge (squash merge) a PR, and trigger the manual
-  release workflow, unless a later task explicitly delegates an action.
+  release workflow, unless a maintainer explicitly delegates an action.
 - Root documentation uses the Japanese `README.md` and its mirrors
   `README.zh-CN.md` and `README.en.md`.
 

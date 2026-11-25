@@ -33,8 +33,7 @@ body:
     id: reproduction
     attributes:
       label: How to reproduce
-      description: Minimal `devcontainer.json` (with Feature options) and steps that show the problem; for tooling, the commands or workflow run.
-      render: jsonc
+      description: Minimal `devcontainer.json` (with Feature options) and steps that show the problem; for tooling, the commands or workflow run (use fenced code blocks where helpful).
     validations:
       required: true
   - type: textarea
