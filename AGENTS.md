@@ -26,7 +26,10 @@ changing it.
 - `just test-global`: run global scenarios.
 - `just test`: test all Features and global scenarios.
 - Feature tests require the Dev Container CLI and a working Docker daemon.
-  Metadata validation also runs in the pull-request `validate` workflow.
+  Metadata validation also runs in the pull-request `validate` workflow, and
+  `.github/workflows/test.yaml` auto-discovers Features from `src/` to test
+  only changed Features (and affected global scenarios) on push/PR or all
+  Features on `workflow_dispatch`.
 
 Agents may inspect, edit, and validate locally. A maintainer decides when to
 commit, push, open or merge a PR, and trigger the manual release workflow,
