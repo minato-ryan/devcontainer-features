@@ -64,6 +64,11 @@
       <td><code>ghcr.io/minato-ryan/devcontainer-features/chezmoi:1</code></td>
     </tr>
     <tr>
+      <td><a href="src/colab/README.md"><strong>colab</strong></a><br /><sub>AI / Cloud</sub></td>
+      <td>Installs Google Colab CLI (<code>colab</code>) and <code>rclone</code> with <code>colab-adc</code> auth helper and project-scoped ADC persistence<br /><sub>Options: <code>version</code>, <code>defaultAuth</code>, <code>installRclone</code>, <code>rcloneVersion</code>, <code>installRcloneMountDependencies</code> ・ Depends on: <code>uv</code> ・ Volume: <code>/var/lib/colab</code></sub></td>
+      <td><code>ghcr.io/minato-ryan/devcontainer-features/colab:1</code></td>
+    </tr>
+    <tr>
       <td><a href="src/deno/README.md"><strong>deno</strong></a><br /><sub>Runtime</sub></td>
       <td>Installs the Deno runtime and JavaScript / TypeScript toolchain<br /><sub>Options: <code>version</code></sub></td>
       <td><code>ghcr.io/minato-ryan/devcontainer-features/deno:1</code></td>

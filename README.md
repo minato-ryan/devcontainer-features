@@ -61,6 +61,11 @@
       <td><code>ghcr.io/minato-ryan/devcontainer-features/chezmoi:1</code></td>
     </tr>
     <tr>
+      <td><a href="src/colab/README.md"><strong>colab</strong></a><br /><sub>AI / Cloud</sub></td>
+      <td>Google Colab CLI（<code>colab</code>）・<code>rclone</code> の導入、<code>colab-adc</code> コマンドおよびプロジェクト単位の ADC 認証情報永続化<br /><sub>オプション: <code>version</code>, <code>defaultAuth</code>, <code>installRclone</code>, <code>rcloneVersion</code>, <code>installRcloneMountDependencies</code> ・ 依存: <code>uv</code> ・ ボリューム: <code>/var/lib/colab</code></sub></td>
+      <td><code>ghcr.io/minato-ryan/devcontainer-features/colab:1</code></td>
+    </tr>
+    <tr>
       <td><a href="src/deno/README.md"><strong>deno</strong></a><br /><sub>Runtime</sub></td>
       <td>Deno ランタイムおよび JavaScript / TypeScript ツールチェーン<br /><sub>オプション: <code>version</code></sub></td>
       <td><code>ghcr.io/minato-ryan/devcontainer-features/deno:1</code></td>
