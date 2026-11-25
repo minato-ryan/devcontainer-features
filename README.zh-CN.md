@@ -18,7 +18,7 @@
 <p>
   <a href="https://github.com/minato-ryan/devcontainer-features/actions/workflows/test.yaml"><img src="https://github.com/minato-ryan/devcontainer-features/actions/workflows/test.yaml/badge.svg" alt="Test Features" /></a>
   <a href="https://github.com/minato-ryan/devcontainer-features/actions/workflows/validate.yml"><img src="https://github.com/minato-ryan/devcontainer-features/actions/workflows/validate.yml/badge.svg" alt="Validate Metadata" /></a>
-  <img src="https://img.shields.io/badge/Features-9-0EA5E9?style=flat-square" alt="Features: 9" />
+  <img src="https://img.shields.io/badge/Features-10-0EA5E9?style=flat-square" alt="Features: 10" />
   <img src="https://img.shields.io/badge/Registry-GHCR-6366F1?style=flat-square&amp;logo=github" alt="Registry: GHCR" />
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-10B981?style=flat-square" alt="License: MIT" /></a>
 </p>
@@ -53,6 +53,11 @@
     </tr>
   </thead>
   <tbody>
+    <tr>
+      <td><a href="src/3d-tools/README.md"><strong>3d-tools</strong></a><br /><sub>3D / Simulation</sub></td>
+      <td>从经校验和验证的官方发布包安装 Blender 与 Godot（标准 / .NET），用于无头 3D 模拟仿真工作流<br /><sub>选项: <code>install*</code>, <code>*Version</code>, <code>godotVariant</code></sub></td>
+      <td><code>ghcr.io/minato-ryan/devcontainer-features/3d-tools:1</code></td>
+    </tr>
     <tr>
       <td><a href="src/chezmoi/README.md"><strong>chezmoi</strong></a><br /><sub>Dotfiles</sub></td>
       <td>安装并初始化配置 chezmoi<br /><sub>选项: <code>config</code> ・ 依赖: <code>common-utils</code></sub></td>
