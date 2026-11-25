@@ -1,188 +1,207 @@
-# Dev Container Features: Self Authoring Template
+<a id="top"></a>
 
-> This repo provides a starting point and example for creating your own custom [dev container Features](https://containers.dev/implementors/features/), hosted for free on GitHub Container Registry.  The example in this repository follows the [dev container Feature distribution specification](https://containers.dev/implementors/features-distribution/).  
->
-> To provide feedback to the specification, please leave a comment [on spec issue #70](https://github.com/devcontainers/spec/issues/70). For more broad feedback regarding dev container Features, please see [spec issue #61](https://github.com/devcontainers/spec/issues/61).
+<div align="center">
 
-## Example Contents
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/logo-dark.svg" />
+  <source media="(prefers-color-scheme: light)" srcset="assets/logo-light.svg" />
+  <img alt="Dev Container Features" src="assets/logo-light.svg" width="96" height="96" />
+</picture>
 
-This repository contains a _collection_ of two Features - `hello` and `color`. These Features serve as simple feature implementations.  Each sub-section below shows a sample `devcontainer.json` alongside example usage of the Feature.
+<h1>Dev Container Features</h1>
 
-### `hello`
+<p>
+  GitHub Container Registry（<code>ghcr.io/minato-ryan/devcontainer-features</code>）で公開する<br />
+  カスタム <a href="https://containers.dev/implementors/features/">Dev Container Features</a> コレクション
+</p>
 
-Running `hello` inside the built container will print the greeting provided to it via its `greeting` option.
+<p>
+  <a href="https://github.com/minato-ryan/devcontainer-features/actions/workflows/test.yaml"><img src="https://github.com/minato-ryan/devcontainer-features/actions/workflows/test.yaml/badge.svg" alt="Test Features" /></a>
+  <a href="https://github.com/minato-ryan/devcontainer-features/actions/workflows/validate.yml"><img src="https://github.com/minato-ryan/devcontainer-features/actions/workflows/validate.yml/badge.svg" alt="Validate Metadata" /></a>
+  <img src="https://img.shields.io/badge/Features-9-0EA5E9?style=flat-square" alt="Features: 9" />
+  <img src="https://img.shields.io/badge/Registry-GHCR-6366F1?style=flat-square&amp;logo=github" alt="Registry: GHCR" />
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-10B981?style=flat-square" alt="License: MIT" /></a>
+</p>
 
-```jsonc
-{
-    "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
-    "features": {
-        "ghcr.io/devcontainers/feature-starter/hello:1": {
-            "greeting": "Hello"
-        }
-    }
-}
-```
+<p>
+  <strong>日本語</strong> &nbsp;·&nbsp; <a href="README.zh-CN.md">简体中文</a> &nbsp;·&nbsp; <a href="README.en.md">English</a>
+</p>
 
-```bash
-$ hello
+<p>
+  <a href="#features">Features</a> &nbsp;·&nbsp;
+  <a href="#quick-start">クイックスタート</a> &nbsp;·&nbsp;
+  <a href="#development">開発とテスト</a> &nbsp;·&nbsp;
+  <a href="#release">リリース</a>
+</p>
 
-Hello, user.
-```
+</div>
 
-### `color`
+---
 
-Running `color` inside the built container will print your favorite color to standard out.
+<a id="features"></a>
+## Features
 
-```jsonc
-{
-    "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
-    "features": {
-        "ghcr.io/devcontainers/feature-starter/color:1": {
-            "favorite": "green"
-        }
-    }
-}
-```
+<table width="100%">
+  <thead>
+    <tr>
+      <th align="left">Feature</th>
+      <th align="left">概要 / オプション</th>
+      <th align="left">OCI 参照</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><a href="src/chezmoi/README.md"><strong>chezmoi</strong></a><br /><sub>Dotfiles</sub></td>
+      <td>chezmoi のインストールと初期設定<br /><sub>オプション: <code>config</code> ・ 依存: <code>common-utils</code></sub></td>
+      <td><code>ghcr.io/minato-ryan/devcontainer-features/chezmoi:1</code></td>
+    </tr>
+    <tr>
+      <td><a href="src/deno/README.md"><strong>deno</strong></a><br /><sub>Runtime</sub></td>
+      <td>Deno ランタイムおよび JavaScript / TypeScript ツールチェーン<br /><sub>オプション: <code>version</code></sub></td>
+      <td><code>ghcr.io/minato-ryan/devcontainer-features/deno:1</code></td>
+    </tr>
+    <tr>
+      <td><a href="src/glab/README.md"><strong>glab</strong></a><br /><sub>GitLab CLI</sub></td>
+      <td>ターミナル向け GitLab CLI（<code>glab</code>）のインストール<br /><sub>オプション: <code>version</code></sub></td>
+      <td><code>ghcr.io/minato-ryan/devcontainer-features/glab:1</code></td>
+    </tr>
+    <tr>
+      <td><a href="src/hf-cli/README.md"><strong>hf-cli</strong></a><br /><sub>AI / Hub</sub></td>
+      <td>Hugging Face CLI（<code>hf</code>）のインストール<br /><sub>オプション: <code>version</code></sub></td>
+      <td><code>ghcr.io/minato-ryan/devcontainer-features/hf-cli:1</code></td>
+    </tr>
+    <tr>
+      <td><a href="src/nvidia-container/README.md"><strong>nvidia-container</strong></a><br /><sub>GPU / Docker</sub></td>
+      <td>NVIDIA Container Toolkit の導入および Docker ランタイム設定<br /><sub>オプション: <code>version</code>, <code>configureDocker</code>, <code>setAsDefault</code></sub></td>
+      <td><code>ghcr.io/minato-ryan/devcontainer-features/nvidia-container:1</code></td>
+    </tr>
+    <tr>
+      <td><a href="src/opencode/README.md"><strong>opencode</strong></a><br /><sub>AI / Coding</sub></td>
+      <td>OpenCode CLI のインストール<br /><sub>オプションなし（<code>common-utils</code> の後に実行）</sub></td>
+      <td><code>ghcr.io/minato-ryan/devcontainer-features/opencode:1</code></td>
+    </tr>
+    <tr>
+      <td><a href="src/openspec/README.md"><strong>openspec</strong></a><br /><sub>AI / Spec</sub></td>
+      <td>OpenSpec CLI（<code>@fission-ai/openspec</code>）のインストール<br /><sub>オプション: <code>version</code> ・ 依存: <code>node</code></sub></td>
+      <td><code>ghcr.io/minato-ryan/devcontainer-features/openspec:1</code></td>
+    </tr>
+    <tr>
+      <td><a href="src/quarto/README.md"><strong>quarto</strong></a><br /><sub>Publishing</sub></td>
+      <td>チェックサム検証済みリリースから Quarto CLI を導入<br /><sub>オプション: <code>version</code>, <code>checksumsSha256</code> ・ VS Code 拡張: <code>quarto.quarto</code></sub></td>
+      <td><code>ghcr.io/minato-ryan/devcontainer-features/quarto:1</code></td>
+    </tr>
+    <tr>
+      <td><a href="src/uv/README.md"><strong>uv</strong></a><br /><sub>Python</sub></td>
+      <td>Astral 製 Python パッケージ・プロジェクトマネージャー <code>uv</code> / <code>uvx</code><br /><sub>オプション: <code>version</code>, <code>toolsToInstall</code></sub></td>
+      <td><code>ghcr.io/minato-ryan/devcontainer-features/uv:1</code></td>
+    </tr>
+  </tbody>
+</table>
 
-```bash
-$ color
+> [!TIP]
+> 各 Feature のオプション仕様・既定値・補足ノートは、テーブル内の Feature 名からそれぞれの `src/<id>/README.md` を参照してください。
 
-my favorite color is green
-```
+<a id="quick-start"></a>
+## クイックスタート
 
-## Repo and Feature Structure
-
-Similar to the [`devcontainers/features`](https://github.com/devcontainers/features) repo, this repository has a `src` folder.  Each Feature has its own sub-folder, containing at least a `devcontainer-feature.json` and an entrypoint script `install.sh`. 
-
-```
-├── src
-│   ├── hello
-│   │   ├── devcontainer-feature.json
-│   │   └── install.sh
-│   ├── color
-│   │   ├── devcontainer-feature.json
-│   │   └── install.sh
-|   ├── ...
-│   │   ├── devcontainer-feature.json
-│   │   └── install.sh
-...
-```
-
-An [implementing tool](https://containers.dev/supporting#tools) will composite [the documented dev container properties](https://containers.dev/implementors/features/#devcontainer-feature-json-properties) from the feature's `devcontainer-feature.json` file, and execute in the `install.sh` entrypoint script in the container during build time.  Implementing tools are also free to process attributes under the `customizations` property as desired.
-
-### Options
-
-All available options for a Feature should be declared in the `devcontainer-feature.json`.  The syntax for the `options` property can be found in the [devcontainer Feature json properties reference](https://containers.dev/implementors/features/#devcontainer-feature-json-properties).
-
-For example, the `color` feature provides an enum of three possible options (`red`, `gold`, `green`).  If no option is provided in a user's `devcontainer.json`, the value is set to "red".
-
-```jsonc
-{
-    // ...
-    "options": {
-        "favorite": {
-            "type": "string",
-            "enum": [
-                "red",
-                "gold",
-                "green"
-            ],
-            "default": "red",
-            "description": "Choose your favorite color."
-        }
-    }
-}
-```
-
-Options are exported as Feature-scoped environment variables.  The option name is captialized and sanitized according to [option resolution](https://containers.dev/implementors/features/#option-resolution).
-
-```bash
-#!/bin/bash
-
-echo "Activating feature 'color'"
-echo "The provided favorite color is: ${FAVORITE}"
-
-...
-```
-
-## Distributing Features
-
-### Versioning
-
-Features are individually versioned by the `version` attribute in a Feature's `devcontainer-feature.json`.  Features are versioned according to the semver specification. More details can be found in [the dev container Feature specification](https://containers.dev/implementors/features/#versioning).
-
-### Publishing
-
-> NOTE: The Distribution spec can be [found here](https://containers.dev/implementors/features-distribution/).  
->
-> While any registry [implementing the OCI Distribution spec](https://github.com/opencontainers/distribution-spec) can be used, this template will leverage GHCR (GitHub Container Registry) as the backing registry.
-
-Features are meant to be easily sharable units of dev container configuration and installation code.  
-
-This repo contains a **GitHub Action** [workflow](.github/workflows/release.yaml) that will publish each Feature to GHCR. 
-
-*Allow GitHub Actions to create and approve pull requests* should be enabled in the repository's `Settings > Actions > General > Workflow permissions` for auto generation of `src/<feature>/README.md` per Feature (which merges any existing `src/<feature>/NOTES.md`).
-
-By default, each Feature will be prefixed with the `<owner/<repo>` namespace.  For example, the two Features in this repository can be referenced in a `devcontainer.json` with:
-
-```
-ghcr.io/devcontainers/feature-starter/color:1
-ghcr.io/devcontainers/feature-starter/hello:1
-```
-
-The provided GitHub Action will also publish a third "metadata" package with just the namespace, eg: `ghcr.io/devcontainers/feature-starter`.  This contains information useful for tools aiding in Feature discovery.
-
-'`devcontainers/feature-starter`' is known as the feature collection namespace.
-
-### Marking Feature Public
-
-Note that by default, GHCR packages are marked as `private`.  To stay within the free tier, Features need to be marked as `public`.
-
-This can be done by navigating to the Feature's "package settings" page in GHCR, and setting the visibility to 'public`.  The URL may look something like:
-
-```
-https://github.com/users/<owner>/packages/container/<repo>%2F<featureName>/settings
-```
-
-<img width="669" alt="image" src="https://user-images.githubusercontent.com/23246594/185244705-232cf86a-bd05-43cb-9c25-07b45b3f4b04.png">
-
-### Adding Features to the Index
-
-If you'd like your Features to appear in our [public index](https://containers.dev/features) so that other community members can find them, you can do the following:
-
-* Go to [github.com/devcontainers/devcontainers.github.io](https://github.com/devcontainers/devcontainers.github.io)
-     * This is the GitHub repo backing the [containers.dev](https://containers.dev/) spec site
-* Open a PR to modify the [collection-index.yml](https://github.com/devcontainers/devcontainers.github.io/blob/gh-pages/_data/collection-index.yml) file
-
-This index is from where [supporting tools](https://containers.dev/supporting) like [VS Code Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) and [GitHub Codespaces](https://github.com/features/codespaces) surface Features for their dev container creation UI.
-
-#### Using private Features in Codespaces
-
-For any Features hosted in GHCR that are kept private, the `GITHUB_TOKEN` access token in your environment will need to have `package:read` and `contents:read` for the associated repository.
-
-Many implementing tools use a broadly scoped access token and will work automatically.  GitHub Codespaces uses repo-scoped tokens, and therefore you'll need to add the permissions in `devcontainer.json`
-
-An example `devcontainer.json` can be found below.
+`devcontainer.json` の `features` に使いたい Feature を追加するだけで利用できます。
 
 ```jsonc
 {
     "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
     "features": {
-     "ghcr.io/my-org/private-features/hello:1": {
-            "greeting": "Hello"
-        }
-    },
-    "customizations": {
-        "codespaces": {
-            "repositories": {
-                "my-org/private-features": {
-                    "permissions": {
-                        "packages": "read",
-                        "contents": "read"
-                    }
-                }
-            }
+        "ghcr.io/minato-ryan/devcontainer-features/uv:1": {
+            "toolsToInstall": "ruff"
+        },
+        "ghcr.io/minato-ryan/devcontainer-features/deno:1": {
+            "version": "latest"
         }
     }
 }
 ```
+
+<details>
+<summary><strong>構成例 1：GPU / AI 開発環境（NVIDIA + Hugging Face + uv）</strong></summary>
+
+```jsonc
+{
+    "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+    "features": {
+        "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+        "ghcr.io/minato-ryan/devcontainer-features/nvidia-container:1": {
+            "configureDocker": true,
+            "setAsDefault": false
+        },
+        "ghcr.io/minato-ryan/devcontainer-features/hf-cli:1": {},
+        "ghcr.io/minato-ryan/devcontainer-features/uv:1": {}
+    }
+}
+```
+
+</details>
+
+<details>
+<summary><strong>構成例 2：ドキュメント &amp; Dotfiles 環境（Quarto + chezmoi）</strong></summary>
+
+```jsonc
+{
+    "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+    "features": {
+        "ghcr.io/minato-ryan/devcontainer-features/quarto:1": {},
+        "ghcr.io/minato-ryan/devcontainer-features/chezmoi:1": {}
+    }
+}
+```
+
+</details>
+
+<a id="development"></a>
+## 開発とテスト
+
+ローカル検証には [Dev Container CLI](https://github.com/devcontainers/cli)、Docker デーモン、`just`、`pre-commit`、`shellcheck` が必要です。
+
+| コマンド | 用途 |
+| --- | --- |
+| `just lint` | 全ファイルに対して `pre-commit`（フォーマット、YAML/JSON、Gitleaks）と `shellcheck` を実行 |
+| `just test-feature <id>` | 指定した Feature のデフォルトテストおよびシナリオテストを実行 |
+| `just test-global` | 複数 Feature を組み合わせたグローバルシナリオのみを実行 |
+| `just test` | すべての Feature テストとグローバルシナリオを一括実行 |
+
+<details>
+<summary><strong>リポジトリ構成を見る</strong></summary>
+
+```text
+.
+├── assets/                             # README 用ライト/ダーク対応 SVG ロゴ
+├── src/
+│   └── <feature>/
+│       ├── devcontainer-feature.json   # Feature のメタデータとオプション定義
+│       ├── install.sh                  # ビルド時に実行されるインストールスクリプト
+│       ├── NOTES.md                    # 任意の補足ノート（自動生成 README に統合）
+│       └── README.md                   # リリースワークフローにより自動生成
+├── test/
+│   ├── <feature>/
+│   │   ├── scenarios.json              # Feature 別テストシナリオ
+│   │   ├── test.sh                     # デフォルト構成テスト
+│   │   └── *.sh                        # シナリオ別テストスクリプト
+│   └── _global/                        # グローバルテストシナリオ
+├── .github/workflows/                  # CI 検証・テスト・リリース用ワークフロー
+└── justfile                            # ローカル検証・テスト用レシピ
+```
+
+</details>
+
+<a id="release"></a>
+## リリースとドキュメント生成
+
+1. 各 Feature のバージョンは `src/<id>/devcontainer-feature.json` の `version` フィールド（SemVer）で個別に管理します。
+2. `main` ブランチで手動実行の [リリースワークフロー](.github/workflows/release.yaml) を起動すると、各 Feature が GHCR へ公開され、`feature_<id>_<semver>` タグが付与されます。
+3. 同時に各 Feature の `src/<id>/README.md`（既存の `src/<id>/NOTES.md` がある場合は統合）が自動生成され、更新用 Pull Request が作成されます。
+
+<hr />
+
+<div align="center">
+  <p>
+    Released under the <a href="LICENSE">MIT License</a> &nbsp;·&nbsp; <a href="#top">↑ トップへ戻る</a>
+  </p>
+</div>

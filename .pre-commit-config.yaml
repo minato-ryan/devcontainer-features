@@ -8,8 +8,6 @@ repos:
       - id: trailing-whitespace
         args:
           - --markdown-linebreak-ext=md
-        # Remove this exception when the starter README is replaced.
-        exclude: ^README\.md$
       - id: end-of-file-fixer
       - id: check-added-large-files
       - id: check-case-conflict
