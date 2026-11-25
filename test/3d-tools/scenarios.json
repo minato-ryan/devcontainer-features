@@ -1,0 +1,42 @@
+{
+    "godot_only_pinned": {
+        "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+        "features": {
+            "3d-tools": {
+                "installBlender": false,
+                "installGodot": true,
+                "godotVersion": "4.6.3"
+            }
+        }
+    },
+    "godot_dotnet": {
+        "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+        "features": {
+            "ghcr.io/devcontainers/features/dotnet:2": {
+                "version": "lts"
+            },
+            "3d-tools": {
+                "installBlender": false,
+                "installGodot": true,
+                "godotVersion": "4.7.2",
+                "godotVariant": "dotnet"
+            }
+        }
+    },
+    "blender_lts": {
+        "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+        "features": {
+            "3d-tools": {
+                "installBlender": true,
+                "blenderVersion": "4.5",
+                "installGodot": false
+            }
+        }
+    },
+    "fedora": {
+        "image": "fedora:latest",
+        "features": {
+            "3d-tools": {}
+        }
+    }
+}

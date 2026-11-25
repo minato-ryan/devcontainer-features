@@ -1,0 +1,52 @@
+{
+    "id": "3d-tools",
+    "version": "1.0.0",
+    "name": "3D Tools",
+    "description": "Installs 3D simulation and modeling tools (Blender and Godot) from verified official releases for headless scripting, rendering, and project workflows.",
+    "documentationURL": "https://github.com/minato-ryan/devcontainer-features/tree/main/src/3d-tools",
+    "options": {
+        "installBlender": {
+            "type": "boolean",
+            "default": true,
+            "description": "Install official Blender release for headless scripting, rendering, and extension development (x86_64 only)."
+        },
+        "blenderVersion": {
+            "type": "string",
+            "proposals": [
+                "latest",
+                "5.3",
+                "4.5"
+            ],
+            "default": "latest",
+            "description": "Blender release: 'latest', a series such as '4.5' or '5.3', or an exact MAJOR.MINOR.PATCH >= 4.2.0."
+        },
+        "installGodot": {
+            "type": "boolean",
+            "default": true,
+            "description": "Install official Godot editor release for headless project workflows."
+        },
+        "godotVersion": {
+            "type": "string",
+            "proposals": [
+                "latest",
+                "4.7.2",
+                "4.6.3"
+            ],
+            "default": "latest",
+            "description": "Godot stable release: 'latest', or MAJOR.MINOR / MAJOR.MINOR.PATCH >= 4.2.2 (optionally with '-stable')."
+        },
+        "godotVariant": {
+            "type": "string",
+            "enum": [
+                "standard",
+                "dotnet"
+            ],
+            "default": "standard",
+            "description": "Godot build variant: 'standard' (GDScript) or 'dotnet' (C# / .NET; pair with a .NET SDK feature)."
+        }
+    },
+    "installsAfter": [
+        "ghcr.io/devcontainers/features/common-utils",
+        "ghcr.io/devcontainers/features/dotnet"
+    ]
+}

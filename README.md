@@ -18,7 +18,7 @@
 <p>
   <a href="https://github.com/minato-ryan/devcontainer-features/actions/workflows/test.yaml"><img src="https://github.com/minato-ryan/devcontainer-features/actions/workflows/test.yaml/badge.svg" alt="Test Features" /></a>
   <a href="https://github.com/minato-ryan/devcontainer-features/actions/workflows/validate.yml"><img src="https://github.com/minato-ryan/devcontainer-features/actions/workflows/validate.yml/badge.svg" alt="Validate Metadata" /></a>
-  <img src="https://img.shields.io/badge/Features-9-0EA5E9?style=flat-square" alt="Features: 9" />
+  <img src="https://img.shields.io/badge/Features-10-0EA5E9?style=flat-square" alt="Features: 10" />
   <img src="https://img.shields.io/badge/Registry-GHCR-6366F1?style=flat-square&amp;logo=github" alt="Registry: GHCR" />
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-10B981?style=flat-square" alt="License: MIT" /></a>
 </p>
@@ -50,6 +50,11 @@
     </tr>
   </thead>
   <tbody>
+    <tr>
+      <td><a href="src/3d-tools/README.md"><strong>3d-tools</strong></a><br /><sub>3D / Simulation</sub></td>
+      <td>チェックサム検証済み公式リリースから Blender・Godot（標準 / .NET）を導入しヘッドレス 3D シミュレーション環境を構築<br /><sub>オプション: <code>install*</code>, <code>*Version</code>, <code>godotVariant</code></sub></td>
+      <td><code>ghcr.io/minato-ryan/devcontainer-features/3d-tools:1</code></td>
+    </tr>
     <tr>
       <td><a href="src/chezmoi/README.md"><strong>chezmoi</strong></a><br /><sub>Dotfiles</sub></td>
       <td>chezmoi のインストールと初期設定<br /><sub>オプション: <code>config</code> ・ 依存: <code>common-utils</code></sub></td>
