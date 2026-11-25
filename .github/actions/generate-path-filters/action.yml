@@ -1,0 +1,51 @@
+name: "Generate Path Filters"
+description: >
+  Scan src/ for Feature directories and run dorny/paths-filter to detect
+  which Features and global tests changed. Caller must run actions/checkout@v4
+  first.
+outputs:
+  features:
+    description: "JSON array of changed Feature names"
+    value: ${{ steps.parse.outputs.features }}
+  global:
+    description: "Whether files under test/_global/ changed ('true' or 'false')"
+    value: ${{ steps.parse.outputs.global }}
+runs:
+  using: composite
+  steps:
+    - name: Generate path filters file
+      id: gen-filters
+      shell: bash
+      run: |
+        shopt -s nullglob
+        filters_file="$RUNNER_TEMP/filters.yml"
+        {
+          for dir in src/*/; do
+            name=$(basename "$dir")
+            if [[ ! "$name" =~ ^[a-z0-9][a-z0-9_-]*$ ]]; then
+              echo "::error::Invalid feature directory name: $name" >&2
+              exit 1
+            fi
+            printf 'feature/%s:\n  - "src/%s/**"\n  - "test/%s/**"\n' \
+              "$name" "$name" "$name"
+          done
+          printf '_global:\n  - "test/_global/**"\n'
+        } > "$filters_file"
+        echo "path=${filters_file}" >> "$GITHUB_OUTPUT"
+
+    - uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
+      id: filter
+      with:
+        filters: ${{ steps.gen-filters.outputs.path }}
+
+    - name: Parse changed outputs
+      id: parse
+      shell: bash
+      env:
+        CHANGES: ${{ steps.filter.outputs.changes }}
+      run: |
+        changes="${CHANGES:-[]}"
+        features=$(printf '%s' "$changes" | jq -c '[.[] | select(startswith("feature/")) | ltrimstr("feature/")] | sort')
+        global=$(printf '%s' "$changes" | jq -r 'if any(. == "_global") then "true" else "false" end')
+        echo "features=${features}" >> "$GITHUB_OUTPUT"
+        echo "global=${global}" >> "$GITHUB_OUTPUT"
