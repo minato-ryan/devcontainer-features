@@ -24,7 +24,10 @@ schema, CLI flag, or Action behavior needs confirmation.
 3. Cover default behavior in `test.sh`; add a named scenario and matching
    `test/<id>/<scenario>.sh` when options or combinations need testing.
    Use `just test-feature <id>` locally. Run `just test-global` if a shared
-   scenario changed. The pull-request `validate` workflow checks manifests.
+   scenario changed. The pull-request `validate` workflow checks manifests, and
+   the `test` workflow auto-discovers Features from `src/` to test only changed
+   Features (and affected global scenarios) on push/PR without manual CI
+   matrix updates.
 4. When published Feature behavior or metadata changes, update that Feature's
    manifest version using SemVer. After integration, the maintainer triggers
    the manual release workflow, whose publish action creates the corresponding
