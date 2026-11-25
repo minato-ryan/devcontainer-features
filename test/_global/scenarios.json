@@ -1,8 +1,14 @@
 {
-    "opencode": {
+    "coding_agents": {
         "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
         "features": {
-            "opencode": {}
+            "coding-agents": {
+                "installClaudeCode": false,
+                "installCodex": false,
+                "installOpenCode": true,
+                "installPi": false,
+                "installAntigravity": false
+            }
         }
     }
 }
