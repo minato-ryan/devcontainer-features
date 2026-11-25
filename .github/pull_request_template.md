@@ -1,6 +1,6 @@
 <!--
-Title format: Conventional Commits `<type>(<scope>): <subject>` (<= 50 chars, no trailing period).
-Scope: the Feature id, or the area (`ci`, `agents`, `devcontainer`, `docs`).
+Title format: Conventional Commits `<type>(<scope>): <subject>` or `<type>: <subject>` (<= 50 chars, no trailing period).
+Scope (optional): the Feature id, or the area (`ci`, `agents`, `devcontainer`, `docs`).
 Do not include AI tool attribution or `Co-authored-by` trailers in commits, title, or description.
 -->
 
