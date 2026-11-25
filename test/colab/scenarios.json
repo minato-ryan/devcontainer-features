@@ -1,0 +1,22 @@
+{
+    "pinned_versions": {
+        "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+        "features": {
+            "colab": {
+                "version": "0.7.6",
+                "defaultAuth": "oauth2",
+                "installRclone": true,
+                "rcloneVersion": "1.70.0",
+                "installRcloneMountDependencies": true
+            }
+        }
+    },
+    "without_rclone": {
+        "image": "mcr.microsoft.com/devcontainers/base:debian",
+        "features": {
+            "colab": {
+                "installRclone": false
+            }
+        }
+    }
+}
